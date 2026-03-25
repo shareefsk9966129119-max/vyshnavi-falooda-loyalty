@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Scanner</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+font-family:Arial;
+background:#1a001d;
+color:white;
+text-align:center;
+padding-top:30px;
+}
+
+h1{ color:#ffcc00; }
+
+#reader{
+width:300px;
+margin:auto;
+margin-top:20px;
+}
+
+.card{
+margin-top:20px;
+}
+
+input{
+padding:10px;
+border-radius:8px;
+width:250px;
+margin-top:15px;
+border:none;
+outline:none;
+}
+
+button{
+margin:10px;
+padding:12px 20px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.add{ background:green; color:white; }
+.sub{ background:red; color:white; }
+.update{ background:#ffcc00; color:black; }
+
+#count{
+font-size:22px;
+margin:0 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Admin Scanner 📷</h1>
+<p>Scan Customer QR OR Enter Phone</p>
+
+<div id="reader"></div>
+
+<h3 id="result"></h3>
+
+<!-- ✅ Manual Input (UPDATED) -->
+<input type="text" id="phoneInput" placeholder="Enter phone manually" onblur="loadCustomer()">
+
+<div class="card">
+
+<h3 id="name"></h3>
+<p id="points"></p>
+
+<div>
+<button class="sub" onclick="change(-1)">➖</button>
+<span id="count">1</span>
+<button class="add" onclick="change(1)">➕</button>
+</div>
+
+<button class="update" onclick="updatePoints()">Update Points</button>
+
+</div>
+
+<script>
+
+const BASE_URL = "http://localhost:5000";
+
+let scannedPhone = "";
+let currentPhone = "";
+let currentCount = 1;
+
+// 🔁 Change count
+function change(val){
+    currentCount += val;
+    if(currentCount < 1) currentCount = 1;
+    document.getElementById("count").innerText = currentCount;
+}
+
+// ✅ QR SCAN SUCCESS
+function onScanSuccess(decodedText) {
+
+    try {
+        const url = new URL(decodedText);
+        scannedPhone = url.searchParams.get("phone");
+    } catch {
+        scannedPhone = decodedText;
+    }
+
+    document.getElementById("result").innerText =
+    "Scanned Phone: " + scannedPhone;
+
+    loadCustomer(scannedPhone);
+}
+
+// ✅ START SCANNER
+let scanner = new Html5QrcodeScanner("reader", {
+    fps: 10,
+    qrbox: 250
+});
+
+scanner.render(onScanSuccess);
+
+// ✅ LOAD CUSTOMER
+async function loadCustomer(phone){
+
+    if(!phone){
+        phone = document.getElementById("phoneInput").value;
+    }
+
+    if(!phone){
+        return;
+    }
+
+    currentPhone = phone;
+
+    try {
+        const res = await fetch(BASE_URL + "/get-customer", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({phone})
+        });
+
+        const data = await res.json();
+
+        if(data.message){
+            document.getElementById("name").innerText = "";
+            document.getElementById("points").innerText = "Customer not found ❌";
+            return;
+        }
+
+        document.getElementById("name").innerText = data.name;
+        document.getElementById("points").innerText =
+        "Current Points: " + data.points;
+
+    } catch (err) {
+        console.log("Error loading customer");
+    }
+}
+
+// ✅ ENTER KEY SUPPORT (VERY IMPORTANT)
+document.getElementById("phoneInput").addEventListener("keypress", function(e) {
+    if(e.key === "Enter"){
+        loadCustomer();
+    }
+});
+
+// ✅ UPDATE POINTS
+async function updatePoints(){
+
+    if(!currentPhone){
+        alert("Scan or enter customer first ❌");
+        return;
+    }
+
+    try {
+        const res = await fetch(BASE_URL + "/add-points", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+                phone: currentPhone,
+                pointsToAdd: currentCount
+            })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+        // Reload updated data
+        loadCustomer(currentPhone);
+
+        // Reset count
+        currentCount = 1;
+        document.getElementById("count").innerText = currentCount;
+
+    } catch (err) {
+        alert("Server error ❌");
+    }
+}
+
+</script>
+
+</body>
+</html>

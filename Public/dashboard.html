@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Your Rewards</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background: radial-gradient(circle at top,#6b0044,#1a001d);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.card{
+background:rgba(30,30,30,0.85);
+padding:40px;
+border-radius:20px;
+text-align:center;
+width:90%;
+max-width:420px;
+
+backdrop-filter: blur(12px);
+
+box-shadow:
+0 0 25px rgba(255,200,0,0.25),
+0 0 60px rgba(255,150,0,0.15);
+
+border:1px solid rgba(255,200,0,0.2);
+}
+
+h1{
+color:#ffcc00;
+margin-bottom:10px;
+}
+
+#name{
+margin-bottom:5px;
+font-size:20px;
+}
+
+#welcome{
+color:#aaa;
+margin-bottom:10px;
+}
+
+#progress{
+margin-bottom:20px;
+color:#ccc;
+white-space: pre-line;
+font-weight:500;
+}
+
+.stamp{
+width:60px;
+height:60px;
+border-radius:50%;
+display:inline-flex;
+justify-content:center;
+align-items:center;
+margin:8px;
+font-size:24px;
+
+background:#222;
+border:2px solid #ffcc00;
+
+box-shadow:0 0 10px rgba(255,204,0,0.3);
+
+transition:0.3s;
+}
+
+.filled{
+background:linear-gradient(45deg,#ffcc00,#ff9900);
+color:black;
+transform:scale(1.15);
+box-shadow:0 0 25px #ffcc00;
+}
+
+.reward-text{
+margin-top:20px;
+font-size:18px;
+color:#ffcc00;
+font-weight:bold;
+}
+
+.qr{
+margin-top:25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Your Falooda Rewards 🥤</h1>
+
+<h3 id="name"></h3>
+<p id="welcome">Welcome back 👋</p>
+
+<p id="progress"></p>
+
+<div>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+</div>
+
+<div class="reward-text">
+Collect 5 → Get 1 FREE 🎁
+</div>
+
+<div class="qr">
+<h4>Show this QR to staff</h4>
+<img id="qr" width="160" style="border-radius:10px;">
+</div>
+
+</div>
+
+<script>
+
+const BASE_URL = "http://localhost:5000";
+
+const params = new URLSearchParams(window.location.search);
+const phone = params.get("phone");
+
+const qr = document.getElementById("qr");
+qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
+
+async function loadCustomer() {
+
+    try {
+
+        const res = await fetch(BASE_URL + "/get-customer", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ phone })
+        });
+
+        const data = await res.json();
+
+        if(!data || data.error){
+            return;
+        }
+
+        document.getElementById("name").innerText = data.name;
+
+        let remaining = data.rewardTarget - data.points;
+
+        // ✅ PREMIUM TEXT (FINAL)
+        document.getElementById("progress").innerText =
+        "You’ve Earned " + data.points + " Reward Points ✨\n" +
+        "Just " + remaining + " More to Enjoy Your Free Falooda 🎁";
+
+        const stamps = document.querySelectorAll(".stamp");
+
+        stamps.forEach((stamp, index) => {
+            if(index < data.points){
+                stamp.classList.add("filled");
+            } else {
+                stamp.classList.remove("filled");
+            }
+        });
+
+        let lastPoints = localStorage.getItem("lastPoints");
+
+        if(lastPoints == 5 && data.points == 0){
+            setTimeout(() => {
+                alert("🎉 Congratulations! You earned a FREE Falooda 🥤");
+            }, 400);
+        }
+
+        localStorage.setItem("lastPoints", data.points);
+
+    } catch (err) {
+        console.log("Server error");
+    }
+}
+
+loadCustomer();
+setInterval(loadCustomer, 3000);
+
+</script>
+
+</body>
+</html>
