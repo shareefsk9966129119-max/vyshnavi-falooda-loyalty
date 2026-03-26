@@ -12,14 +12,11 @@ const Customer = require("./models/Customer");
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend (IMPORTANT: folder name must match exactly)
+// ✅ Serve frontend
 app.use(express.static(path.join(__dirname, "Public")));
 
-// ✅ MongoDB Connection (using ENV)
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+// ✅ MongoDB Connection (FIXED)
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
 
