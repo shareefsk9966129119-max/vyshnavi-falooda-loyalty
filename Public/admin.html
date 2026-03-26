@@ -84,7 +84,17 @@ margin:0 10px;
 
 <script>
 
-// ✅ AUTO DETECT BASE URL (IMPORTANT FIX)
+// 🔐 ADMIN SECURITY (ADDED)
+const ADMIN_PASSWORD = "1234"; // change this later
+
+const enteredPassword = prompt("Enter Admin Password 🔐");
+
+if (enteredPassword !== ADMIN_PASSWORD) {
+    alert("Access Denied ❌");
+    window.location.href = "/";
+}
+
+// ✅ AUTO DETECT BASE URL
 const BASE_URL = window.location.origin;
 
 let scannedPhone = "";
