@@ -65,8 +65,7 @@ margin:0 10px;
 
 <h3 id="result"></h3>
 
-<!-- ✅ Manual Input (UPDATED) -->
-<input type="text" id="phoneInput" placeholder="Enter phone manually" onblur="loadCustomer()">
+<input type="text" id="phoneInput" placeholder="Enter phone manually">
 
 <div class="card">
 
@@ -85,7 +84,8 @@ margin:0 10px;
 
 <script>
 
-const BASE_URL = "http://localhost:5000";
+// ✅ AUTO DETECT BASE URL (IMPORTANT FIX)
+const BASE_URL = window.location.origin;
 
 let scannedPhone = "";
 let currentPhone = "";
@@ -155,11 +155,11 @@ async function loadCustomer(phone){
         "Current Points: " + data.points;
 
     } catch (err) {
-        console.log("Error loading customer");
+        alert("Server error ❌");
     }
 }
 
-// ✅ ENTER KEY SUPPORT (VERY IMPORTANT)
+// ✅ ENTER KEY SUPPORT
 document.getElementById("phoneInput").addEventListener("keypress", function(e) {
     if(e.key === "Enter"){
         loadCustomer();
@@ -188,10 +188,8 @@ async function updatePoints(){
 
         alert(data.message);
 
-        // Reload updated data
         loadCustomer(currentPhone);
 
-        // Reset count
         currentCount = 1;
         document.getElementById("count").innerText = currentCount;
 

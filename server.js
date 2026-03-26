@@ -12,11 +12,14 @@ const Customer = require("./models/Customer");
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend
-app.use(express.static(path.join(__dirname, "Public"))); // NOTE: capital P
+// ✅ Serve frontend (IMPORTANT: folder name must match exactly)
+app.use(express.static(path.join(__dirname, "Public")));
 
-// ✅ MongoDB Connection (USE ENV VARIABLE)
-mongoose.connect(process.env.MONGO_URI)
+// ✅ MongoDB Connection (using ENV)
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
 
@@ -47,7 +50,7 @@ app.post("/add-customer", async (req, res) => {
         const existingCustomer = await Customer.findOne({ phone });
 
         if (existingCustomer) {
-            return res.status(200).json({
+            return res.json({
                 message: "Customer already exists ✅",
                 customer: existingCustomer
             });
@@ -145,7 +148,7 @@ app.post("/add-points", async (req, res) => {
     }
 });
 
-// ✅ IMPORTANT FOR RENDER (PORT FIX)
+// ✅ PORT FIX FOR RENDER
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

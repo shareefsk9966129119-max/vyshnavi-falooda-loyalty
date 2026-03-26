@@ -124,14 +124,23 @@ Collect 5 → Get 1 FREE 🎁
 
 <script>
 
-const BASE_URL = "http://localhost:5000";
+// ✅ AUTO FIX BASE URL (IMPORTANT)
+const BASE_URL = window.location.origin;
 
+// ✅ GET PHONE FROM URL
 const params = new URLSearchParams(window.location.search);
 const phone = params.get("phone");
 
+// ❌ If no phone → stop
+if(!phone){
+    alert("Invalid access ❌");
+}
+
+// ✅ QR GENERATION
 const qr = document.getElementById("qr");
 qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
+// ✅ LOAD CUSTOMER
 async function loadCustomer() {
 
     try {
@@ -154,7 +163,6 @@ async function loadCustomer() {
 
         let remaining = data.rewardTarget - data.points;
 
-        // ✅ PREMIUM TEXT (FINAL)
         document.getElementById("progress").innerText =
         "You’ve Earned " + data.points + " Reward Points ✨\n" +
         "Just " + remaining + " More to Enjoy Your Free Falooda 🎁";
@@ -184,6 +192,7 @@ async function loadCustomer() {
     }
 }
 
+// ✅ LOAD + AUTO REFRESH
 loadCustomer();
 setInterval(loadCustomer, 3000);
 

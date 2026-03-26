@@ -102,6 +102,9 @@ Buy 5 Faloodas → Enjoy a
 
 <script>
 
+// ✅ AUTO FIX BASE URL (IMPORTANT)
+const BASE_URL = window.location.origin;
+
 async function registerCustomer() {
 
     const name = document.getElementById("name").value;
@@ -114,7 +117,7 @@ async function registerCustomer() {
     }
 
     try {
-        const res = await fetch("http://localhost:5000/add-customer", {
+        const res = await fetch(BASE_URL + "/add-customer", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -126,8 +129,8 @@ async function registerCustomer() {
 
         alert(data.message);
 
-        // 🔥 REDIRECT
-        window.location.href = "dashboard.html?phone=" + phone;
+        // 🔥 REDIRECT TO DASHBOARD
+        window.location.href = "/dashboard.html?phone=" + phone;
 
     } catch (error) {
         alert("Server not reachable ❌ Check connection");
