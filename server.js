@@ -20,19 +20,16 @@ mongoose.connect("mongodb+srv://VyshnaviFalooda:Shaik2025@cluster0.xxes0.mongodb
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
 
-
 // ✅ Default Route
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-
 
 // ✅ TEST ROUTE
 app.get("/all-customers", async (req, res) => {
     const customers = await Customer.find();
     res.json(customers);
 });
-
 
 // ✅ Add Customer API
 app.post("/add-customer", async (req, res) => {
@@ -71,7 +68,6 @@ app.post("/add-customer", async (req, res) => {
     }
 });
 
-
 // ✅ Get Customer API (ENHANCED)
 app.post("/get-customer", async (req, res) => {
     try {
@@ -98,7 +94,6 @@ app.post("/get-customer", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 // ✅ Add Points API (UPDATED FOR ADMIN CONTROL)
 app.post("/add-points", async (req, res) => {
@@ -148,8 +143,8 @@ app.post("/add-points", async (req, res) => {
     }
 });
 
-
 // ✅ Start Server
 app.listen(5000, () => {
     console.log("Server running on port 5000 🚀");
 });
+
