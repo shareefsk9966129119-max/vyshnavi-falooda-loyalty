@@ -13,22 +13,26 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ Serve frontend
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "Public"))); // NOTE: capital P
 
-// ✅ MongoDB Connection
-mongoose.connect("mongodb+srv://VyshnaviFalooda:Shaik2025@cluster0.xxes0.mongodb.net/VyshnaviFalooda?retryWrites=true&w=majority")
+// ✅ MongoDB Connection (USE ENV VARIABLE)
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
 
 // ✅ Default Route
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "Public", "index.html"));
 });
 
 // ✅ TEST ROUTE
 app.get("/all-customers", async (req, res) => {
-    const customers = await Customer.find();
-    res.json(customers);
+    try {
+        const customers = await Customer.find();
+        res.json(customers);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // ✅ Add Customer API
@@ -68,7 +72,7 @@ app.post("/add-customer", async (req, res) => {
     }
 });
 
-// ✅ Get Customer API (ENHANCED)
+// ✅ Get Customer API
 app.post("/get-customer", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -79,15 +83,15 @@ app.post("/get-customer", async (req, res) => {
             return res.status(404).json({ message: "Customer not found ❌" });
         }
 
-        const rewardTarget = 5; // You can change anytime
+        const rewardTarget = 5;
         const remaining = rewardTarget - customer.points;
 
         res.json({
             name: customer.name,
             phone: customer.phone,
             points: customer.points,
-            rewardTarget: rewardTarget,
-            remaining: remaining
+            rewardTarget,
+            remaining
         });
 
     } catch (error) {
@@ -95,7 +99,7 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// ✅ Add Points API (UPDATED FOR ADMIN CONTROL)
+// ✅ Add Points API
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;
@@ -112,7 +116,6 @@ app.post("/add-points", async (req, res) => {
 
         customer.points += pointsToAdd;
 
-        // Prevent negative points
         if (customer.points < 0) {
             customer.points = 0;
         }
@@ -120,7 +123,6 @@ app.post("/add-points", async (req, res) => {
         // 🎉 Reward Logic
         if (customer.points >= 5) {
             customer.points = 0;
-
             await customer.save();
 
             return res.json({
@@ -143,8 +145,9 @@ app.post("/add-points", async (req, res) => {
     }
 });
 
-// ✅ Start Server
-app.listen(5000, () => {
-    console.log("Server running on port 5000 🚀");
-});
+// ✅ IMPORTANT FOR RENDER (PORT FIX)
+const PORT = process.env.PORT || 5000;
 
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} 🚀`);
+});
