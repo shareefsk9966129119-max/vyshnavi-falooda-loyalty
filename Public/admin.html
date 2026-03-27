@@ -84,14 +84,24 @@ margin:0 10px;
 
 <script>
 
-// 🔐 ADMIN SECURITY (ADDED)
-const ADMIN_PASSWORD = "1234"; // change this later
+// 🔐 ADMIN SECURITY (FIXED)
+const ADMIN_PASSWORD = "1234"; // change later
 
 const enteredPassword = prompt("Enter Admin Password 🔐");
 
+// ❌ If wrong → STOP EVERYTHING
 if (enteredPassword !== ADMIN_PASSWORD) {
+
     alert("Access Denied ❌");
-    window.location.href = "/";
+
+    // Clear entire UI
+    document.body.innerHTML = `
+        <h1 style="color:red; margin-top:100px;">Access Denied ❌</h1>
+        <p>You are not authorized to access this page</p>
+    `;
+
+    // Stop JS execution completely
+    throw new Error("Unauthorized Access");
 }
 
 // ✅ AUTO DETECT BASE URL
