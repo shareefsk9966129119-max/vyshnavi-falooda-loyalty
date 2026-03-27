@@ -11,8 +11,9 @@ background: radial-gradient(circle at top,#6b0044,#1a001d);
 color:white;
 display:flex;
 justify-content:center;
-align-items:center;
-height:100vh;
+align-items:flex-start; /* FIXED */
+min-height:100vh; /* FIXED */
+padding:20px 0; /* FIXED */
 }
 
 .card{
@@ -90,35 +91,45 @@ font-weight:bold;
 margin-top:25px;
 }
 
-/* ✅ NEW SECTION */
+/* ✅ SIDE BY SIDE SECTION */
 .extra-section{
 margin-top:30px;
 padding-top:20px;
 border-top:1px solid rgba(255,255,255,0.1);
+
+display:flex;
+justify-content:space-between;
+gap:20px;
+flex-wrap:wrap;
+text-align:center;
 }
 
-.extra-section h3{
+.extra-box{
+flex:1;
+min-width:150px;
+}
+
+.extra-box h3{
 color:#ffcc00;
 margin-bottom:10px;
 }
 
-.extra-section p{
+.extra-box p{
 font-size:14px;
 margin-bottom:10px;
 color:#ccc;
 }
 
-.extra-section button{
+.extra-box button{
 padding:8px 16px;
 border:none;
 border-radius:8px;
 background:#ff4081;
 color:white;
 cursor:pointer;
-margin-top:5px;
 }
 
-.extra-section button:hover{
+.extra-box button:hover{
 background:#ff1a66;
 }
 </style>
@@ -152,20 +163,26 @@ Collect 5 → Get 1 FREE 🎁
 <img id="qr" width="160" style="border-radius:10px;">
 </div>
 
-<!-- ✅ NEW ADDED SECTION -->
+<!-- ✅ UPDATED SECTION -->
 <div class="extra-section">
 
-<h3>📍 Visit Our Store</h3>
-<p>Vyshnavi Falooda, Vijayawada</p>
+  <!-- LEFT -->
+  <div class="extra-box">
+    <h3>📍 Visit Our Store</h3>
+    <p>Vyshnavi Falooda, Vijayawada</p>
 
-<a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
-<button>Open Location 📍</button>
-</a>
+    <a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
+      <button>Open Location 📍</button>
+    </a>
+  </div>
 
-<h3 style="margin-top:20px;">🎯 Refer & Earn</h3>
-<p>Refer 5 friends and get <b>1 FREE Scoop 🍨</b></p>
+  <!-- RIGHT -->
+  <div class="extra-box">
+    <h3>🎯 Refer & Earn</h3>
+    <p>Refer 5 friends and get <b>1 FREE Scoop 🍨</b></p>
 
-<button onclick="shareReferral()">Share Referral</button>
+    <button onclick="shareReferral()">Share Referral</button>
+  </div>
 
 </div>
 
@@ -173,23 +190,18 @@ Collect 5 → Get 1 FREE 🎁
 
 <script>
 
-// ✅ AUTO FIX BASE URL
 const BASE_URL = window.location.origin;
 
-// ✅ GET PHONE FROM URL
 const params = new URLSearchParams(window.location.search);
 const phone = params.get("phone");
 
-// ❌ If no phone → stop
 if(!phone){
     alert("Invalid access ❌");
 }
 
-// ✅ QR GENERATION
 const qr = document.getElementById("qr");
 qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
-// ✅ LOAD CUSTOMER
 async function loadCustomer() {
 
     try {
@@ -241,7 +253,6 @@ async function loadCustomer() {
     }
 }
 
-// ✅ REFERRAL SHARE FUNCTION
 function shareReferral() {
     const link = window.location.href;
 
@@ -256,7 +267,6 @@ function shareReferral() {
     }
 }
 
-// ✅ LOAD + AUTO REFRESH
 loadCustomer();
 setInterval(loadCustomer, 3000);
 
