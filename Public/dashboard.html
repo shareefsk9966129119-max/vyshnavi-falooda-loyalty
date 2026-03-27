@@ -89,6 +89,38 @@ font-weight:bold;
 .qr{
 margin-top:25px;
 }
+
+/* ✅ NEW SECTION */
+.extra-section{
+margin-top:30px;
+padding-top:20px;
+border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.extra-section h3{
+color:#ffcc00;
+margin-bottom:10px;
+}
+
+.extra-section p{
+font-size:14px;
+margin-bottom:10px;
+color:#ccc;
+}
+
+.extra-section button{
+padding:8px 16px;
+border:none;
+border-radius:8px;
+background:#ff4081;
+color:white;
+cursor:pointer;
+margin-top:5px;
+}
+
+.extra-section button:hover{
+background:#ff1a66;
+}
 </style>
 </head>
 
@@ -120,11 +152,28 @@ Collect 5 → Get 1 FREE 🎁
 <img id="qr" width="160" style="border-radius:10px;">
 </div>
 
+<!-- ✅ NEW ADDED SECTION -->
+<div class="extra-section">
+
+<h3>📍 Visit Our Store</h3>
+<p>Vyshnavi Falooda, Vijayawada</p>
+
+<a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
+<button>Open Location 📍</button>
+</a>
+
+<h3 style="margin-top:20px;">🎯 Refer & Earn</h3>
+<p>Refer 5 friends and get <b>1 FREE Scoop 🍨</b></p>
+
+<button onclick="shareReferral()">Share Referral</button>
+
+</div>
+
 </div>
 
 <script>
 
-// ✅ AUTO FIX BASE URL (IMPORTANT)
+// ✅ AUTO FIX BASE URL
 const BASE_URL = window.location.origin;
 
 // ✅ GET PHONE FROM URL
@@ -189,6 +238,21 @@ async function loadCustomer() {
 
     } catch (err) {
         console.log("Server error");
+    }
+}
+
+// ✅ REFERRAL SHARE FUNCTION
+function shareReferral() {
+    const link = window.location.href;
+
+    if (navigator.share) {
+        navigator.share({
+            title: "Vyshnavi Falooda Rewards",
+            text: "Join and earn free rewards 🥤",
+            url: link
+        });
+    } else {
+        alert("Copy and share this link:\n" + link);
     }
 }
 
