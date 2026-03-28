@@ -11,9 +11,9 @@ background: radial-gradient(circle at top,#6b0044,#1a001d);
 color:white;
 display:flex;
 justify-content:center;
-align-items:flex-start; /* FIXED */
-min-height:100vh; /* FIXED */
-padding:20px 0; /* FIXED */
+align-items:flex-start;
+min-height:100vh;
+padding:20px 0;
 }
 
 .card{
@@ -33,20 +33,9 @@ box-shadow:
 border:1px solid rgba(255,200,0,0.2);
 }
 
-h1{
-color:#ffcc00;
-margin-bottom:10px;
-}
-
-#name{
-margin-bottom:5px;
-font-size:20px;
-}
-
-#welcome{
-color:#aaa;
-margin-bottom:10px;
-}
+h1{ color:#ffcc00; margin-bottom:10px; }
+#name{ margin-bottom:5px; font-size:20px; }
+#welcome{ color:#aaa; margin-bottom:10px; }
 
 #progress{
 margin-bottom:20px;
@@ -56,20 +45,11 @@ font-weight:500;
 }
 
 .stamp{
-width:60px;
-height:60px;
-border-radius:50%;
-display:inline-flex;
-justify-content:center;
-align-items:center;
-margin:8px;
-font-size:24px;
-
-background:#222;
-border:2px solid #ffcc00;
-
+width:60px;height:60px;border-radius:50%;
+display:inline-flex;justify-content:center;align-items:center;
+margin:8px;font-size:24px;
+background:#222;border:2px solid #ffcc00;
 box-shadow:0 0 10px rgba(255,204,0,0.3);
-
 transition:0.3s;
 }
 
@@ -87,16 +67,12 @@ color:#ffcc00;
 font-weight:bold;
 }
 
-.qr{
-margin-top:25px;
-}
+.qr{ margin-top:25px; }
 
-/* ✅ SIDE BY SIDE SECTION */
 .extra-section{
 margin-top:30px;
 padding-top:20px;
 border-top:1px solid rgba(255,255,255,0.1);
-
 display:flex;
 justify-content:space-between;
 gap:20px;
@@ -104,33 +80,52 @@ flex-wrap:wrap;
 text-align:center;
 }
 
-.extra-box{
-flex:1;
-min-width:150px;
-}
+.extra-box{ flex:1; min-width:150px; }
 
-.extra-box h3{
-color:#ffcc00;
-margin-bottom:10px;
-}
-
-.extra-box p{
-font-size:14px;
-margin-bottom:10px;
-color:#ccc;
-}
+.extra-box h3{ color:#ffcc00; margin-bottom:10px; }
+.extra-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
 
 .extra-box button{
 padding:8px 16px;
+border:none;border-radius:8px;
+background:#ff4081;color:white;cursor:pointer;
+}
+
+.extra-box button:hover{ background:#ff1a66; }
+
+/* ✅ REFERRAL INPUT */
+.ref-section{
+margin-top:25px;
+padding-top:20px;
+border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.ref-section input{
+width:90%;
+padding:8px;
+margin:6px 0;
+border-radius:6px;
+border:none;
+outline:none;
+}
+
+.ref-section button{
+margin-top:10px;
+padding:10px 20px;
 border:none;
 border-radius:8px;
-background:#ff4081;
+background:#00c853;
 color:white;
 cursor:pointer;
 }
 
-.extra-box button:hover{
-background:#ff1a66;
+.ref-section button:hover{
+background:#00a844;
+}
+
+#refMsg{
+margin-top:10px;
+color:#ffcc00;
 }
 </style>
 </head>
@@ -163,26 +158,39 @@ Collect 5 → Get 1 FREE 🎁
 <img id="qr" width="160" style="border-radius:10px;">
 </div>
 
-<!-- ✅ UPDATED SECTION -->
+<!-- LOCATION + REFERRAL INFO -->
 <div class="extra-section">
 
-  <!-- LEFT -->
-  <div class="extra-box">
-    <h3>📍 Visit Our Store</h3>
-    <p>Vyshnavi Falooda, Vijayawada</p>
+<div class="extra-box">
+<h3>📍 Visit Our Store</h3>
+<p>Vyshnavi Falooda, Vijayawada</p>
+<a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
+<button>Open Location 📍</button>
+</a>
+</div>
 
-    <a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
-      <button>Open Location 📍</button>
-    </a>
-  </div>
+<div class="extra-box">
+<h3>🎯 Refer & Earn</h3>
+<p>Refer 5 friends and get <b>1 FREE Scoop 🍨</b></p>
+<button onclick="shareReferral()">Share Referral</button>
+</div>
 
-  <!-- RIGHT -->
-  <div class="extra-box">
-    <h3>🎯 Refer & Earn</h3>
-    <p>Refer 5 friends and get <b>1 FREE Scoop 🍨</b></p>
+</div>
 
-    <button onclick="shareReferral()">Share Referral</button>
-  </div>
+<!-- ✅ NEW REFERRAL INPUT -->
+<div class="ref-section">
+
+<h3>📲 Enter 5 Friend Numbers</h3>
+
+<input type="text" placeholder="Mobile Number 1" class="refInput">
+<input type="text" placeholder="Mobile Number 2" class="refInput">
+<input type="text" placeholder="Mobile Number 3" class="refInput">
+<input type="text" placeholder="Mobile Number 4" class="refInput">
+<input type="text" placeholder="Mobile Number 5" class="refInput">
+
+<button onclick="submitReferrals()">Submit Referrals</button>
+
+<p id="refMsg"></p>
 
 </div>
 
@@ -191,7 +199,6 @@ Collect 5 → Get 1 FREE 🎁
 <script>
 
 const BASE_URL = window.location.origin;
-
 const params = new URLSearchParams(window.location.search);
 const phone = params.get("phone");
 
@@ -199,26 +206,19 @@ if(!phone){
     alert("Invalid access ❌");
 }
 
-const qr = document.getElementById("qr");
-qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
+document.getElementById("qr").src =
+"https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
 async function loadCustomer() {
-
     try {
-
         const res = await fetch(BASE_URL + "/get-customer", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ phone })
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({ phone })
         });
 
         const data = await res.json();
-
-        if(!data || data.error){
-            return;
-        }
+        if(!data || data.error) return;
 
         document.getElementById("name").innerText = data.name;
 
@@ -230,7 +230,7 @@ async function loadCustomer() {
 
         const stamps = document.querySelectorAll(".stamp");
 
-        stamps.forEach((stamp, index) => {
+        stamps.forEach((stamp, index)=>{
             if(index < data.points){
                 stamp.classList.add("filled");
             } else {
@@ -238,37 +238,40 @@ async function loadCustomer() {
             }
         });
 
-        let lastPoints = localStorage.getItem("lastPoints");
-
-        if(lastPoints == 5 && data.points == 0){
-            setTimeout(() => {
-                alert("🎉 Congratulations! You earned a FREE Falooda 🥤");
-            }, 400);
-        }
-
-        localStorage.setItem("lastPoints", data.points);
-
-    } catch (err) {
+    } catch {
         console.log("Server error");
     }
 }
 
-function shareReferral() {
+function shareReferral(){
     const link = window.location.href;
+    alert("Share this link:\n" + link);
+}
 
-    if (navigator.share) {
-        navigator.share({
-            title: "Vyshnavi Falooda Rewards",
-            text: "Join and earn free rewards 🥤",
-            url: link
-        });
-    } else {
-        alert("Copy and share this link:\n" + link);
-    }
+/* ✅ SUBMIT REFERRALS */
+async function submitReferrals(){
+
+    const inputs = document.querySelectorAll(".refInput");
+    let numbers = [];
+
+    inputs.forEach(input=>{
+        if(input.value.trim() !== ""){
+            numbers.push(input.value.trim());
+        }
+    });
+
+    const res = await fetch(BASE_URL + "/add-referrals", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ phone, referrals:numbers })
+    });
+
+    const data = await res.json();
+    document.getElementById("refMsg").innerText = data.message;
 }
 
 loadCustomer();
-setInterval(loadCustomer, 3000);
+setInterval(loadCustomer,3000);
 
 </script>
 

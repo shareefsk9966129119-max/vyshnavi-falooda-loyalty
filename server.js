@@ -5,37 +5,36 @@ const path = require("path");
 
 const app = express();
 
-// Import Customer Model
+// Import Models
 const Customer = require("./models/Customer");
+const Referral = require("./models/Referral"); // ✅ NEW MODEL
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend
+// Serve frontend
 app.use(express.static(path.join(__dirname, "Public")));
 
-// ✅ MongoDB Connection (FIXED)
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
 
-// ✅ Default Route
+// Default Route
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "Public", "index.html"));
 });
 
-// ✅ TEST ROUTE
+// TEST ROUTE
 app.get("/all-customers", async (req, res) => {
-    try {
-        const customers = await Customer.find();
-        res.json(customers);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    const customers = await Customer.find();
+    res.json(customers);
 });
 
-// ✅ Add Customer API
+// ================= CUSTOMER =================
+
+// Add Customer
 app.post("/add-customer", async (req, res) => {
     try {
         const { name, phone, dob } = req.body;
@@ -57,7 +56,8 @@ app.post("/add-customer", async (req, res) => {
             name,
             phone,
             dob,
-            points: 0
+            points: 0,
+            referrals: 0 // ✅ NEW
         });
 
         await newCustomer.save();
@@ -72,7 +72,7 @@ app.post("/add-customer", async (req, res) => {
     }
 });
 
-// ✅ Get Customer API
+// Get Customer
 app.post("/get-customer", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -91,7 +91,8 @@ app.post("/get-customer", async (req, res) => {
             phone: customer.phone,
             points: customer.points,
             rewardTarget,
-            remaining
+            remaining,
+            referrals: customer.referrals || 0 // ✅ NEW
         });
 
     } catch (error) {
@@ -99,14 +100,10 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// ✅ Add Points API
+// Add Points
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;
-
-        if (!phone || pointsToAdd === undefined) {
-            return res.status(400).json({ message: "Phone and points required ❌" });
-        }
 
         const customer = await Customer.findOne({ phone });
 
@@ -116,19 +113,13 @@ app.post("/add-points", async (req, res) => {
 
         customer.points += pointsToAdd;
 
-        if (customer.points < 0) {
-            customer.points = 0;
-        }
-
-        // 🎉 Reward Logic
         if (customer.points >= 5) {
             customer.points = 0;
             await customer.save();
 
             return res.json({
                 message: "🎉 FREE Falooda Earned 🥤",
-                free: true,
-                points: 0
+                free: true
             });
         }
 
@@ -145,7 +136,82 @@ app.post("/add-points", async (req, res) => {
     }
 });
 
-// ✅ PORT FIX FOR RENDER
+// ================= REFERRAL SYSTEM =================
+
+// ✅ ADD REFERRALS API
+app.post("/add-referrals", async (req, res) => {
+    try {
+        const { phone, referrals } = req.body;
+
+        if (!phone || !referrals || referrals.length === 0) {
+            return res.json({ message: "No numbers provided ❌" });
+        }
+
+        const customer = await Customer.findOne({ phone });
+
+        if (!customer) {
+            return res.json({ message: "Customer not found ❌" });
+        }
+
+        let addedCount = 0;
+        let rejected = [];
+
+        // Remove duplicates in same request
+        const uniqueNumbers = [...new Set(referrals)];
+
+        for (let refNumber of uniqueNumbers) {
+
+            // ❌ Self referral
+            if (refNumber === phone) {
+                rejected.push(refNumber + " (self)");
+                continue;
+            }
+
+            // ❌ Already used globally
+            const exists = await Referral.findOne({ referredPhone: refNumber });
+
+            if (exists) {
+                rejected.push(refNumber + " (already used)");
+                continue;
+            }
+
+            // ✅ Save referral
+            await Referral.create({
+                referredBy: phone,
+                referredPhone: refNumber
+            });
+
+            addedCount++;
+        }
+
+        // Update count
+        customer.referrals += addedCount;
+
+        let rewardMsg = "";
+
+        if (customer.referrals >= 5) {
+            customer.points += 1; // 🎁 reward
+            customer.referrals = customer.referrals - 5;
+
+            rewardMsg = " 🎉 FREE Scoop Earned!";
+        }
+
+        await customer.save();
+
+        res.json({
+            message:
+                "Added: " + addedCount +
+                " | Rejected: " + rejected.length +
+                rewardMsg
+        });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ================= SERVER =================
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
