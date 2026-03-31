@@ -198,7 +198,7 @@ async function loadCustomer() {
     }
 }
 
-/* ✅ FINAL FIXED WHATSAPP SHARE */
+/* ✅ FINAL WHATSAPP SHARE (BEST VERSION) */
 function shareWhatsApp(){
 
     const message =
@@ -212,15 +212,19 @@ You must try once!
 📍 Location:
 https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
 
-    // Copy message
-    navigator.clipboard.writeText(message)
-    .then(() => {
-        alert("Message copied! Paste in WhatsApp 👍");
-        window.open("https://web.whatsapp.com/", "_blank");
-    })
-    .catch(() => {
-        alert("Copy failed ❌");
-    });
+    const encodedMessage = encodeURIComponent(message);
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    let url;
+
+    if(isMobile){
+        url = "https://wa.me/?text=" + encodedMessage;
+    } else {
+        url = "https://web.whatsapp.com/send?text=" + encodedMessage;
+    }
+
+    window.open(url, "_blank");
 }
 
 loadCustomer();
