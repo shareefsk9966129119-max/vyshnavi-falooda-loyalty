@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<meta charset="UTF-8"> <!-- ✅ FIXED EMOJI ISSUE -->
+
 <title>Your Rewards</title>
 
 <style>
@@ -160,6 +163,8 @@ if(!phone){
 document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
+let customerName = ""; // ✅ store name for message
+
 async function loadCustomer() {
     try {
         const res = await fetch(BASE_URL + "/get-customer", {
@@ -170,6 +175,8 @@ async function loadCustomer() {
 
         const data = await res.json();
         if(!data || data.error) return;
+
+        customerName = data.name; // ✅ save name
 
         document.getElementById("name").innerText = data.name;
 
@@ -194,13 +201,15 @@ async function loadCustomer() {
     }
 }
 
-/* ✅ WHATSAPP SHARE */
+/* ✅ WHATSAPP SHARE (IMPROVED 🔥) */
 function shareWhatsApp(){
 
     const message =
-`Hi, I tried falooda at Vyshnavi Falooda 😍
+`Hi! I'm ${customerName} 👋
 
-It was very delicious 😋
+I tried falooda at Vyshnavi Falooda 😍
+It was super delicious 😋
+
 You must try once!
 
 📍 Location:
