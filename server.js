@@ -7,7 +7,6 @@ const app = express();
 
 // Import Models
 const Customer = require("./models/Customer");
-const Referral = require("./models/Referral"); // ✅ NEW MODEL
 
 // Middleware
 app.use(cors());
@@ -24,12 +23,6 @@ mongoose.connect(process.env.MONGO_URI)
 // Default Route
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "Public", "index.html"));
-});
-
-// TEST ROUTE
-app.get("/all-customers", async (req, res) => {
-    const customers = await Customer.find();
-    res.json(customers);
 });
 
 // ================= CUSTOMER =================
@@ -56,8 +49,7 @@ app.post("/add-customer", async (req, res) => {
             name,
             phone,
             dob,
-            points: 0,
-            referrals: 0 // ✅ NEW
+            points: 0
         });
 
         await newCustomer.save();
@@ -91,8 +83,7 @@ app.post("/get-customer", async (req, res) => {
             phone: customer.phone,
             points: customer.points,
             rewardTarget,
-            remaining,
-            referrals: customer.referrals || 0 // ✅ NEW
+            remaining
         });
 
     } catch (error) {
@@ -100,7 +91,7 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// Add Points
+// Add Points (for admin scan)
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;
@@ -133,80 +124,6 @@ app.post("/add-points", async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: error.message });
-    }
-});
-
-// ================= REFERRAL SYSTEM =================
-
-// ✅ ADD REFERRALS API
-app.post("/add-referrals", async (req, res) => {
-    try {
-        const { phone, referrals } = req.body;
-
-        if (!phone || !referrals || referrals.length === 0) {
-            return res.json({ message: "No numbers provided ❌" });
-        }
-
-        const customer = await Customer.findOne({ phone });
-
-        if (!customer) {
-            return res.json({ message: "Customer not found ❌" });
-        }
-
-        let addedCount = 0;
-        let rejected = [];
-
-        // Remove duplicates in same request
-        const uniqueNumbers = [...new Set(referrals)];
-
-        for (let refNumber of uniqueNumbers) {
-
-            // ❌ Self referral
-            if (refNumber === phone) {
-                rejected.push(refNumber + " (self)");
-                continue;
-            }
-
-            // ❌ Already used globally
-            const exists = await Referral.findOne({ referredPhone: refNumber });
-
-            if (exists) {
-                rejected.push(refNumber + " (already used)");
-                continue;
-            }
-
-            // ✅ Save referral
-            await Referral.create({
-                referredBy: phone,
-                referredPhone: refNumber
-            });
-
-            addedCount++;
-        }
-
-        // Update count
-        customer.referrals += addedCount;
-
-        let rewardMsg = "";
-
-        if (customer.referrals >= 5) {
-            customer.points += 1; // 🎁 reward
-            customer.referrals = customer.referrals - 5;
-
-            rewardMsg = " 🎉 FREE Scoop Earned!";
-        }
-
-        await customer.save();
-
-        res.json({
-            message:
-                "Added: " + addedCount +
-                " | Rejected: " + rejected.length +
-                rewardMsg
-        });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
     }
 });
 

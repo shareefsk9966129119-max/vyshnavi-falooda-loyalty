@@ -23,7 +23,6 @@ border-radius:20px;
 text-align:center;
 width:90%;
 max-width:420px;
-
 backdrop-filter: blur(12px);
 
 box-shadow:
@@ -86,47 +85,16 @@ text-align:center;
 .extra-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
 
 .extra-box button{
-padding:8px 16px;
+padding:10px 16px;
 border:none;border-radius:8px;
-background:#ff4081;color:white;cursor:pointer;
-}
-
-.extra-box button:hover{ background:#ff1a66; }
-
-/* ✅ REFERRAL INPUT */
-.ref-section{
-margin-top:25px;
-padding-top:20px;
-border-top:1px solid rgba(255,255,255,0.1);
-}
-
-.ref-section input{
-width:90%;
-padding:8px;
-margin:6px 0;
-border-radius:6px;
-border:none;
-outline:none;
-}
-
-.ref-section button{
-margin-top:10px;
-padding:10px 20px;
-border:none;
-border-radius:8px;
-background:#00c853;
+background:#25D366;
 color:white;
 cursor:pointer;
+font-weight:bold;
 }
 
-.ref-section button:hover{
-background:#00a844;
-}
+.extra-box button:hover{ background:#1ebe5d; }
 
-#refMsg{
-margin-top:10px;
-color:#ffcc00;
-}
 </style>
 </head>
 
@@ -158,7 +126,7 @@ Collect 5 → Get 1 FREE 🎁
 <img id="qr" width="160" style="border-radius:10px;">
 </div>
 
-<!-- LOCATION + REFERRAL INFO -->
+<!-- LOCATION + REFERRAL -->
 <div class="extra-section">
 
 <div class="extra-box">
@@ -171,26 +139,9 @@ Collect 5 → Get 1 FREE 🎁
 
 <div class="extra-box">
 <h3>🎯 Refer & Earn</h3>
-<p>Refer 5 friends and get <b>1 FREE Scoop 🍨</b></p>
-<button onclick="shareReferral()">Share Referral</button>
+<p>Share with friends & get rewards 🍨</p>
+<button onclick="shareWhatsApp()">Share on WhatsApp</button>
 </div>
-
-</div>
-
-<!-- ✅ NEW REFERRAL INPUT -->
-<div class="ref-section">
-
-<h3>📲 Enter 5 Friend Numbers</h3>
-
-<input type="text" placeholder="Mobile Number 1" class="refInput">
-<input type="text" placeholder="Mobile Number 2" class="refInput">
-<input type="text" placeholder="Mobile Number 3" class="refInput">
-<input type="text" placeholder="Mobile Number 4" class="refInput">
-<input type="text" placeholder="Mobile Number 5" class="refInput">
-
-<button onclick="submitReferrals()">Submit Referrals</button>
-
-<p id="refMsg"></p>
 
 </div>
 
@@ -243,31 +194,21 @@ async function loadCustomer() {
     }
 }
 
-function shareReferral(){
-    const link = window.location.href;
-    alert("Share this link:\n" + link);
-}
+/* ✅ WHATSAPP SHARE */
+function shareWhatsApp(){
 
-/* ✅ SUBMIT REFERRALS */
-async function submitReferrals(){
+    const message =
+`Hi, I tried falooda at Vyshnavi Falooda 😍
 
-    const inputs = document.querySelectorAll(".refInput");
-    let numbers = [];
+It was very delicious 😋
+You must try once!
 
-    inputs.forEach(input=>{
-        if(input.value.trim() !== ""){
-            numbers.push(input.value.trim());
-        }
-    });
+📍 Location:
+https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
 
-    const res = await fetch(BASE_URL + "/add-referrals", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify({ phone, referrals:numbers })
-    });
+    const url = "https://wa.me/?text=" + encodeURIComponent(message);
 
-    const data = await res.json();
-    document.getElementById("refMsg").innerText = data.message;
+    window.open(url, "_blank");
 }
 
 loadCustomer();
