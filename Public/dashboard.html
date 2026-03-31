@@ -2,7 +2,7 @@
 <html>
 <head>
 
-<meta charset="UTF-8"> <!-- ✅ FIXED EMOJI ISSUE -->
+<meta charset="UTF-8">
 
 <title>Your Rewards</title>
 
@@ -129,7 +129,6 @@ Collect 5 → Get 1 FREE 🎁
 <img id="qr" width="160" style="border-radius:10px;">
 </div>
 
-<!-- LOCATION + REFERRAL -->
 <div class="extra-section">
 
 <div class="extra-box">
@@ -163,7 +162,7 @@ if(!phone){
 document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
-let customerName = ""; // ✅ store name for message
+let customerName = "";
 
 async function loadCustomer() {
     try {
@@ -176,7 +175,7 @@ async function loadCustomer() {
         const data = await res.json();
         if(!data || data.error) return;
 
-        customerName = data.name; // ✅ save name
+        customerName = data.name;
 
         document.getElementById("name").innerText = data.name;
 
@@ -201,19 +200,19 @@ async function loadCustomer() {
     }
 }
 
-/* ✅ WHATSAPP SHARE (IMPROVED 🔥) */
+/* ✅ FINAL WHATSAPP SHARE (100% SAFE) */
 function shareWhatsApp(){
 
     const message =
-`Hi! I'm ${customerName} 👋
+"Hi! I'm " + customerName + " \u{1F44B}\n\n" +
 
-I tried falooda at Vyshnavi Falooda 😍
-It was super delicious 😋
+"I tried falooda at Vyshnavi Falooda \u{1F60D}\n" +
+"It was super delicious \u{1F60B}\n\n" +
 
-You must try once!
+"You must try once!\n\n" +
 
-📍 Location:
-https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
+"\u{1F4CD} Location:\n" +
+"https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada";
 
     const url = "https://wa.me/?text=" + encodeURIComponent(message);
 
