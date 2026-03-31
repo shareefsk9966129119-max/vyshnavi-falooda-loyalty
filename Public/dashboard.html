@@ -3,7 +3,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <title>Your Rewards</title>
 
 <style>
@@ -176,7 +175,6 @@ async function loadCustomer() {
         if(!data || data.error) return;
 
         customerName = data.name;
-
         document.getElementById("name").innerText = data.name;
 
         let remaining = data.rewardTarget - data.points;
@@ -200,23 +198,29 @@ async function loadCustomer() {
     }
 }
 
-/* ✅ FINAL WHATSAPP SHARE (100% SAFE) */
+/* ✅ FINAL FIXED WHATSAPP SHARE */
 function shareWhatsApp(){
 
     const message =
-"Hi! I'm " + customerName + " \u{1F44B}\n\n" +
+`Hi! I'm ${customerName} 👋
 
-"I tried falooda at Vyshnavi Falooda 🥰\n" +
-"It was super delicious 😋\n\n" +
+I tried falooda at Vyshnavi Falooda 🥰
+It was super delicious 😋
 
-"You must try once!\n\n" +
+You must try once!
 
-"\u{1F4CD} Location:\n" +
-"https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada";
+📍 Location:
+https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
 
-    const url = "https://wa.me/?text=" + encodeURIComponent(message);
-
-    window.open(url, "_blank");
+    // Copy message
+    navigator.clipboard.writeText(message)
+    .then(() => {
+        alert("Message copied! Paste in WhatsApp 👍");
+        window.open("https://web.whatsapp.com/", "_blank");
+    })
+    .catch(() => {
+        alert("Copy failed ❌");
+    });
 }
 
 loadCustomer();
