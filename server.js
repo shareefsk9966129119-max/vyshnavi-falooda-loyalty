@@ -100,7 +100,7 @@ app.post("/login-customer", async (req, res) => {
     }
 });
 
-// 🔐 SEND OTP (FORGOT PASSWORD)
+// 🔐 SEND OTP
 app.post("/send-otp", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -115,19 +115,60 @@ app.post("/send-otp", async (req, res) => {
             return res.json({ message: "User not found ❌" });
         }
 
-        // 🔢 GENERATE OTP
         const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-        // ⏳ EXPIRE IN 5 MINUTES
         otpStore[phone] = {
             otp,
             expires: Date.now() + 5 * 60 * 1000
         };
 
-        console.log(`OTP for ${phone}: ${otp}`); // 👉 SEE IN TERMINAL
+        console.log(`OTP for ${phone}: ${otp}`);
 
         res.json({
             message: "OTP sent (check server console) 🔐"
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 🔐 RESET PASSWORD (FINAL STEP)
+app.post("/reset-password", async (req, res) => {
+    try {
+        const { phone, otp, newPassword } = req.body;
+
+        if (!phone || !otp || !newPassword) {
+            return res.status(400).json({ message: "All fields required ❌" });
+        }
+
+        const stored = otpStore[phone];
+
+        if (!stored) {
+            return res.json({ success: false, message: "OTP not found ❌" });
+        }
+
+        if (Date.now() > stored.expires) {
+            delete otpStore[phone];
+            return res.json({ success: false, message: "OTP expired ❌" });
+        }
+
+        if (stored.otp !== otp) {
+            return res.json({ success: false, message: "Invalid OTP ❌" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await Customer.findOneAndUpdate(
+            { phone },
+            { password: hashedPassword }
+        );
+
+        delete otpStore[phone];
+
+        res.json({
+            success: true,
+            message: "Password reset successful ✅"
         });
 
     } catch (error) {
