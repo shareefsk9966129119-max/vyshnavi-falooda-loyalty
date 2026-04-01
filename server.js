@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const bcrypt = require("bcryptjs");
+const axios = require("axios"); // ✅ NEW
 
 const app = express();
 
@@ -100,7 +101,7 @@ app.post("/login-customer", async (req, res) => {
     }
 });
 
-// 🔐 SEND OTP
+// 🔐 SEND OTP (UPDATED WITH SMS)
 app.post("/send-otp", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -122,18 +123,36 @@ app.post("/send-otp", async (req, res) => {
             expires: Date.now() + 5 * 60 * 1000
         };
 
-        console.log(`OTP for ${phone}: ${otp}`);
+        console.log("Backup OTP (if SMS fails):", otp);
+
+        // 📱 SEND SMS
+        await axios.post("https://www.fast2sms.com/dev/bulkV2", {
+            route: "q",
+            message: `Your Vyshnavi Falooda OTP is ${otp}`,
+            language: "english",
+            flash: 0,
+            numbers: phone
+        }, {
+            headers: {
+                authorization: "CLIgjYxFbUJXnmd9AoKcP1pwrvy85uQzltZES6qNhO7s4kaDRWrefwRE6NMFIqtTGJ2s8lPxZbCAamOv",
+                "Content-Type": "application/json"
+            }
+        });
 
         res.json({
-            message: "OTP sent (check server console) 🔐"
+            message: "OTP sent to your mobile 📱"
         });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("SMS Error:", error.response?.data || error.message);
+
+        res.status(500).json({
+            message: "Failed to send OTP ❌"
+        });
     }
 });
 
-// 🔐 RESET PASSWORD (FINAL STEP)
+// 🔐 RESET PASSWORD
 app.post("/reset-password", async (req, res) => {
     try {
         const { phone, otp, newPassword } = req.body;
