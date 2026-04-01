@@ -2,8 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const bcrypt = require("bcryptjs");
 
 const app = express();
+
+// 🔐 TEMP OTP STORAGE
+const otpStore = {};
 
 // Import Models
 const Customer = require("./models/Customer");
@@ -27,36 +31,103 @@ app.get("/", (req, res) => {
 
 // ================= CUSTOMER =================
 
-// Add Customer
+// 🆕 Add Customer
 app.post("/add-customer", async (req, res) => {
     try {
-        const { name, phone, dob } = req.body;
+        const { name, phone, dob, password } = req.body;
 
-        if (!name || !phone || !dob) {
-            return res.status(400).json({ message: "Name, Phone and DOB required ❌" });
+        if (!name || !phone || !dob || !password) {
+            return res.status(400).json({ message: "All fields required ❌" });
         }
 
         const existingCustomer = await Customer.findOne({ phone });
 
         if (existingCustomer) {
             return res.json({
-                message: "Customer already exists ✅",
-                customer: existingCustomer
+                message: "Customer already exists ✅"
             });
         }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const newCustomer = new Customer({
             name,
             phone,
             dob,
+            password: hashedPassword,
             points: 0
         });
 
         await newCustomer.save();
 
         res.json({
-            message: "Customer Added Successfully ✅",
-            customer: newCustomer
+            message: "Registered Successfully ✅"
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 🔐 LOGIN
+app.post("/login-customer", async (req, res) => {
+    try {
+        const { phone, password } = req.body;
+
+        if (!phone || !password) {
+            return res.status(400).json({ message: "Enter all details ❌" });
+        }
+
+        const customer = await Customer.findOne({ phone });
+
+        if (!customer) {
+            return res.json({ success: false, message: "User not found ❌" });
+        }
+
+        const isMatch = await bcrypt.compare(password, customer.password);
+
+        if (!isMatch) {
+            return res.json({ success: false, message: "Wrong password ❌" });
+        }
+
+        res.json({
+            success: true,
+            message: "Login successful ✅"
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 🔐 SEND OTP (FORGOT PASSWORD)
+app.post("/send-otp", async (req, res) => {
+    try {
+        const { phone } = req.body;
+
+        if (!phone) {
+            return res.status(400).json({ message: "Phone required ❌" });
+        }
+
+        const customer = await Customer.findOne({ phone });
+
+        if (!customer) {
+            return res.json({ message: "User not found ❌" });
+        }
+
+        // 🔢 GENERATE OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+
+        // ⏳ EXPIRE IN 5 MINUTES
+        otpStore[phone] = {
+            otp,
+            expires: Date.now() + 5 * 60 * 1000
+        };
+
+        console.log(`OTP for ${phone}: ${otp}`); // 👉 SEE IN TERMINAL
+
+        res.json({
+            message: "OTP sent (check server console) 🔐"
         });
 
     } catch (error) {
@@ -91,7 +162,7 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// Add Points (for admin scan)
+// Add Points
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;

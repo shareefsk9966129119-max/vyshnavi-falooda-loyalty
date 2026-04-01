@@ -26,11 +26,9 @@ max-width:430px;
 width:92%;
 text-align:center;
 backdrop-filter: blur(14px);
-
 box-shadow:
 0 0 30px rgba(255,200,0,0.20),
 0 0 70px rgba(255,150,0,0.10);
-
 border:1px solid rgba(255,200,0,0.2);
 }
 
@@ -41,14 +39,14 @@ margin-bottom:15px;
 
 h1{
 color:#ffcc00;
-font-size:28px;
+font-size:26px;
 margin-bottom:10px;
 }
 
 .subtitle{
 color:#e5e5e5;
-margin-bottom:25px;
-font-size:16px;
+margin-bottom:20px;
+font-size:15px;
 }
 
 .reward{
@@ -58,22 +56,33 @@ font-weight:bold;
 
 input{
 width:92%;
-padding:15px;
-margin:12px 0;
+padding:14px;
+margin:10px 0;
 border-radius:12px;
 border:none;
 font-size:15px;
 }
 
 button{
-margin-top:20px;
-padding:14px 30px;
+margin-top:15px;
+padding:12px 28px;
 border:none;
 border-radius:12px;
-font-size:16px;
+font-size:15px;
 font-weight:bold;
 background:linear-gradient(45deg,#ffcc00,#ff9900);
 cursor:pointer;
+}
+
+.link{
+margin-top:15px;
+font-size:14px;
+cursor:pointer;
+color:#ffcc00;
+}
+
+.hidden{
+display:none;
 }
 </style>
 
@@ -85,33 +94,66 @@ cursor:pointer;
 
 <img src="logo.jpg" class="logo">
 
-<h1>Vyshnavi Falooda Royal Club</h1>
+<h1>Welcome to Vyshnavi Falooda</h1>
 
 <div class="subtitle">
 Buy 5 Faloodas → Enjoy a 
 <span class="reward">Free Falooda</span>
 </div>
 
+<!-- 🔐 LOGIN FORM -->
+<div id="loginForm">
+
+<input type="tel" id="loginPhone" placeholder="Mobile Number" required>
+<input type="password" id="loginPassword" placeholder="Password" required>
+
+<button onclick="loginCustomer()">Login</button>
+
+<div class="link" onclick="showRegister()">New user? Register here</div>
+<div class="link" onclick="forgotPassword()">Forgot Password?</div>
+
+</div>
+
+<!-- 🆕 REGISTER FORM -->
+<div id="registerForm" class="hidden">
+
 <input type="text" id="name" placeholder="Your Name" required>
 <input type="tel" id="phone" placeholder="Mobile Number" required>
 <input type="date" id="dob" required>
+<input type="password" id="password" placeholder="Create Password" required>
 
-<button onclick="registerCustomer()">Join Royal Club</button>
+<button onclick="registerCustomer()">Register</button>
+
+<div class="link" onclick="showLogin()">Already user? Login</div>
+
+</div>
 
 </div>
 
 <script>
 
-// ✅ AUTO FIX BASE URL (IMPORTANT)
 const BASE_URL = window.location.origin;
 
+// 🔁 TOGGLE FORMS
+function showRegister(){
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("registerForm").classList.remove("hidden");
+}
+
+function showLogin(){
+    document.getElementById("registerForm").classList.add("hidden");
+    document.getElementById("loginForm").classList.remove("hidden");
+}
+
+// 🆕 REGISTER
 async function registerCustomer() {
 
     const name = document.getElementById("name").value;
     const phone = document.getElementById("phone").value;
     const dob = document.getElementById("dob").value;
+    const password = document.getElementById("password").value;
 
-    if(!name || !phone || !dob){
+    if(!name || !phone || !dob || !password){
         alert("Please fill all details ❌");
         return;
     }
@@ -122,20 +164,58 @@ async function registerCustomer() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ name, phone, dob })
+            body: JSON.stringify({ name, phone, dob, password })
         });
 
         const data = await res.json();
 
         alert(data.message);
 
-        // 🔥 REDIRECT TO DASHBOARD
-        window.location.href = "/dashboard.html?phone=" + phone;
+        showLogin();
 
     } catch (error) {
-        alert("Server not reachable ❌ Check connection");
+        alert("Server not reachable ❌");
         console.error(error);
     }
+}
+
+// 🔐 LOGIN
+async function loginCustomer(){
+
+    const phone = document.getElementById("loginPhone").value;
+    const password = document.getElementById("loginPassword").value;
+
+    if(!phone || !password){
+        alert("Enter all details ❌");
+        return;
+    }
+
+    try {
+        const res = await fetch(BASE_URL + "/login-customer", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ phone, password })
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+            window.location.href = "/dashboard.html?phone=" + phone;
+        } else {
+            alert(data.message);
+        }
+
+    } catch (error) {
+        alert("Server error ❌");
+        console.error(error);
+    }
+}
+
+// 🔁 FORGOT PASSWORD (NEXT STEP)
+function forgotPassword(){
+    alert("Reset password feature coming next 🔐");
 }
 
 </script>
