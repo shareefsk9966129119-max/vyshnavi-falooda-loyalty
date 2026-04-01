@@ -4,9 +4,7 @@
 <title>Vyshnavi Falooda Royal Club</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 body{
 min-height:100vh;
@@ -32,27 +30,13 @@ box-shadow:
 border:1px solid rgba(255,200,0,0.2);
 }
 
-.logo{
-width:180px;
-margin-bottom:15px;
-}
+.logo{ width:180px; margin-bottom:15px; }
 
-h1{
-color:#ffcc00;
-font-size:26px;
-margin-bottom:10px;
-}
+h1{ color:#ffcc00; font-size:26px; margin-bottom:10px; }
 
-.subtitle{
-color:#e5e5e5;
-margin-bottom:20px;
-font-size:15px;
-}
+.subtitle{ color:#e5e5e5; margin-bottom:20px; font-size:15px; }
 
-.reward{
-color:#ffcc00;
-font-weight:bold;
-}
+.reward{ color:#ffcc00; font-weight:bold; }
 
 input{
 width:92%;
@@ -81,9 +65,7 @@ cursor:pointer;
 color:#ffcc00;
 }
 
-.hidden{
-display:none;
-}
+.hidden{ display:none; }
 </style>
 
 </head>
@@ -101,31 +83,38 @@ Buy 5 Faloodas → Enjoy a
 <span class="reward">Free Falooda</span>
 </div>
 
-<!-- 🔐 LOGIN FORM -->
+<!-- 🔐 LOGIN -->
 <div id="loginForm">
-
-<input type="tel" id="loginPhone" placeholder="Mobile Number" required>
-<input type="password" id="loginPassword" placeholder="Password" required>
+<input type="tel" id="loginPhone" placeholder="Mobile Number">
+<input type="password" id="loginPassword" placeholder="Password">
 
 <button onclick="loginCustomer()">Login</button>
 
 <div class="link" onclick="showRegister()">New user? Register here</div>
 <div class="link" onclick="forgotPassword()">Forgot Password?</div>
-
 </div>
 
-<!-- 🆕 REGISTER FORM -->
+<!-- 🆕 REGISTER -->
 <div id="registerForm" class="hidden">
-
-<input type="text" id="name" placeholder="Your Name" required>
-<input type="tel" id="phone" placeholder="Mobile Number" required>
-<input type="date" id="dob" required>
-<input type="password" id="password" placeholder="Create Password" required>
+<input type="text" id="name" placeholder="Your Name">
+<input type="tel" id="phone" placeholder="Mobile Number">
+<input type="date" id="dob">
+<input type="password" id="password" placeholder="Create Password">
 
 <button onclick="registerCustomer()">Register</button>
 
 <div class="link" onclick="showLogin()">Already user? Login</div>
+</div>
 
+<!-- 🔐 RESET PASSWORD -->
+<div id="resetForm" class="hidden">
+<input type="tel" id="resetPhone" placeholder="Mobile Number">
+<input type="text" id="otp" placeholder="Enter OTP">
+<input type="password" id="newPassword" placeholder="New Password">
+
+<button onclick="resetPassword()">Reset Password</button>
+
+<div class="link" onclick="showLogin()">Back to Login</div>
 </div>
 
 </div>
@@ -134,112 +123,106 @@ Buy 5 Faloodas → Enjoy a
 
 const BASE_URL = window.location.origin;
 
-// 🔁 TOGGLE FORMS
+// TOGGLE
 function showRegister(){
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("registerForm").classList.remove("hidden");
+document.getElementById("loginForm").classList.add("hidden");
+document.getElementById("resetForm").classList.add("hidden");
+document.getElementById("registerForm").classList.remove("hidden");
 }
 
 function showLogin(){
-    document.getElementById("registerForm").classList.add("hidden");
-    document.getElementById("loginForm").classList.remove("hidden");
+document.getElementById("registerForm").classList.add("hidden");
+document.getElementById("resetForm").classList.add("hidden");
+document.getElementById("loginForm").classList.remove("hidden");
 }
 
-// 🆕 REGISTER
-async function registerCustomer() {
+// REGISTER
+async function registerCustomer(){
+const name = document.getElementById("name").value;
+const phone = document.getElementById("phone").value;
+const dob = document.getElementById("dob").value;
+const password = document.getElementById("password").value;
 
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-    const dob = document.getElementById("dob").value;
-    const password = document.getElementById("password").value;
-
-    if(!name || !phone || !dob || !password){
-        alert("Please fill all details ❌");
-        return;
-    }
-
-    try {
-        const res = await fetch(BASE_URL + "/add-customer", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name, phone, dob, password })
-        });
-
-        const data = await res.json();
-
-        alert(data.message);
-
-        showLogin();
-
-    } catch (error) {
-        alert("Server not reachable ❌");
-        console.error(error);
-    }
+if(!name || !phone || !dob || !password){
+alert("Fill all details ❌");
+return;
 }
 
-// 🔐 LOGIN
+const res = await fetch(BASE_URL + "/add-customer", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name,phone,dob,password})
+});
+
+const data = await res.json();
+alert(data.message);
+showLogin();
+}
+
+// LOGIN
 async function loginCustomer(){
+const phone = document.getElementById("loginPhone").value;
+const password = document.getElementById("loginPassword").value;
 
-    const phone = document.getElementById("loginPhone").value;
-    const password = document.getElementById("loginPassword").value;
+const res = await fetch(BASE_URL + "/login-customer", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({phone,password})
+});
 
-    if(!phone || !password){
-        alert("Enter all details ❌");
-        return;
-    }
+const data = await res.json();
 
-    try {
-        const res = await fetch(BASE_URL + "/login-customer", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ phone, password })
-        });
-
-        const data = await res.json();
-
-        if(data.success){
-            window.location.href = "/dashboard.html?phone=" + phone;
-        } else {
-            alert(data.message);
-        }
-
-    } catch (error) {
-        alert("Server error ❌");
-        console.error(error);
-    }
+if(data.success){
+window.location.href="/dashboard.html?phone="+phone;
+}else{
+alert(data.message);
+}
 }
 
-// 🔐 FORGOT PASSWORD (UPDATED ✅)
+// FORGOT PASSWORD
 async function forgotPassword(){
+const phone = prompt("Enter your phone number:");
 
-    const phone = prompt("Enter your phone number:");
+if(!phone){ alert("Phone required ❌"); return; }
 
-    if(!phone){
-        alert("Phone required ❌");
-        return;
-    }
+const res = await fetch(BASE_URL + "/send-otp", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({phone})
+});
 
-    try{
-        const res = await fetch(BASE_URL + "/send-otp", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ phone })
-        });
+const data = await res.json();
+alert(data.message);
 
-        const data = await res.json();
+// SHOW RESET FORM
+document.getElementById("loginForm").classList.add("hidden");
+document.getElementById("resetForm").classList.remove("hidden");
+document.getElementById("resetPhone").value = phone;
+}
 
-        alert(data.message);
+// RESET PASSWORD
+async function resetPassword(){
+const phone = document.getElementById("resetPhone").value;
+const otp = document.getElementById("otp").value;
+const newPassword = document.getElementById("newPassword").value;
 
-    }catch(error){
-        alert("Error sending OTP ❌");
-        console.log(error);
-    }
+if(!phone || !otp || !newPassword){
+alert("Fill all fields ❌");
+return;
+}
+
+const res = await fetch(BASE_URL + "/reset-password", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({phone,otp,newPassword})
+});
+
+const data = await res.json();
+alert(data.message);
+
+if(data.success){
+showLogin();
+}
 }
 
 </script>
