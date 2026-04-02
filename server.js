@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const bcrypt = require("bcryptjs");
-const axios = require("axios"); // ✅ NEW
+const axios = require("axios");
 
 const app = express();
 
@@ -56,7 +56,8 @@ app.post("/add-customer", async (req, res) => {
             phone,
             dob,
             password: hashedPassword,
-            points: 0
+            points: 0,
+            rewards: [] // ✅ NEW
         });
 
         await newCustomer.save();
@@ -101,14 +102,10 @@ app.post("/login-customer", async (req, res) => {
     }
 });
 
-// 🔐 SEND OTP (UPDATED WITH SMS)
+// 🔐 SEND OTP
 app.post("/send-otp", async (req, res) => {
     try {
         const { phone } = req.body;
-
-        if (!phone) {
-            return res.status(400).json({ message: "Phone required ❌" });
-        }
 
         const customer = await Customer.findOne({ phone });
 
@@ -123,9 +120,8 @@ app.post("/send-otp", async (req, res) => {
             expires: Date.now() + 5 * 60 * 1000
         };
 
-        console.log("Backup OTP (if SMS fails):", otp);
+        console.log("Backup OTP:", otp);
 
-        // 📱 SEND SMS
         await axios.post("https://www.fast2sms.com/dev/bulkV2", {
             route: "q",
             message: `Your Vyshnavi Falooda OTP is ${otp}`,
@@ -134,21 +130,18 @@ app.post("/send-otp", async (req, res) => {
             numbers: phone
         }, {
             headers: {
-                authorization: "CLIgjYxFbUJXnmd9AoKcP1pwrvy85uQzltZES6qNhO7s4kaDRWrefwRE6NMFIqtTGJ2s8lPxZbCAamOv",
+                authorization: "YOUR_API_KEY",
                 "Content-Type": "application/json"
             }
         });
 
         res.json({
-            message: "OTP sent to your mobile 📱"
+            message: "OTP sent 📱"
         });
 
     } catch (error) {
-        console.error("SMS Error:", error.response?.data || error.message);
-
-        res.status(500).json({
-            message: "Failed to send OTP ❌"
-        });
+        console.error(error.response?.data || error.message);
+        res.status(500).json({ message: "OTP failed ❌" });
     }
 });
 
@@ -157,22 +150,9 @@ app.post("/reset-password", async (req, res) => {
     try {
         const { phone, otp, newPassword } = req.body;
 
-        if (!phone || !otp || !newPassword) {
-            return res.status(400).json({ message: "All fields required ❌" });
-        }
-
         const stored = otpStore[phone];
 
-        if (!stored) {
-            return res.json({ success: false, message: "OTP not found ❌" });
-        }
-
-        if (Date.now() > stored.expires) {
-            delete otpStore[phone];
-            return res.json({ success: false, message: "OTP expired ❌" });
-        }
-
-        if (stored.otp !== otp) {
+        if (!stored || stored.otp !== otp) {
             return res.json({ success: false, message: "Invalid OTP ❌" });
         }
 
@@ -195,6 +175,8 @@ app.post("/reset-password", async (req, res) => {
     }
 });
 
+// ================= REWARD SYSTEM =================
+
 // Get Customer
 app.post("/get-customer", async (req, res) => {
     try {
@@ -206,15 +188,25 @@ app.post("/get-customer", async (req, res) => {
             return res.status(404).json({ message: "Customer not found ❌" });
         }
 
-        const rewardTarget = 5;
-        const remaining = rewardTarget - customer.points;
+        const rewards = customer.rewards;
+
+        const validRewards = rewards.filter(r => {
+            const diff = (Date.now() - new Date(r.earnedAt)) / (1000 * 60 * 60 * 24);
+            return diff <= 7 && !r.used;
+        });
+
+        const expiredRewards = rewards.filter(r => {
+            const diff = (Date.now() - new Date(r.earnedAt)) / (1000 * 60 * 60 * 24);
+            return diff > 7 && !r.used;
+        });
 
         res.json({
             name: customer.name,
             phone: customer.phone,
             points: customer.points,
-            rewardTarget,
-            remaining
+            totalRewards: rewards.length,
+            validRewards: validRewards.length,
+            expiredRewards: expiredRewards.length
         });
 
     } catch (error) {
@@ -222,7 +214,7 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// Add Points
+// Add Points (FINAL LOGIC)
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;
@@ -233,24 +225,30 @@ app.post("/add-points", async (req, res) => {
             return res.status(404).json({ message: "Customer not found ❌" });
         }
 
+        // ➕ Add points
         customer.points += pointsToAdd;
 
-        if (customer.points >= 5) {
-            customer.points = 0;
-            await customer.save();
+        // 🧠 Calculate rewards
+        const totalRewardsShouldBe = Math.floor(customer.points / 5);
+        const currentRewards = customer.rewards.length;
 
-            return res.json({
-                message: "🎉 FREE Falooda Earned 🥤",
-                free: true
-            });
+        if (totalRewardsShouldBe > currentRewards) {
+            const newRewards = totalRewardsShouldBe - currentRewards;
+
+            for (let i = 0; i < newRewards; i++) {
+                customer.rewards.push({
+                    earnedAt: new Date(),
+                    used: false
+                });
+            }
         }
 
         await customer.save();
 
         res.json({
-            message: "Points Updated ✅",
-            free: false,
-            points: customer.points
+            message: "Points & rewards updated ✅",
+            points: customer.points,
+            rewards: customer.rewards.length
         });
 
     } catch (error) {
