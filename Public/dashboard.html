@@ -68,6 +68,14 @@ color:#ffcc00;
 font-weight:bold;
 }
 
+.badge{
+margin-top:10px;
+font-size:14px;
+}
+
+.valid{ color:#00ff9c; }
+.expired{ color:#ff4d4d; }
+
 .qr{ margin-top:25px; }
 
 .extra-section{
@@ -111,7 +119,7 @@ font-weight:bold;
 
 <p id="progress"></p>
 
-<div>
+<div id="stamps">
 <span class="stamp">🥤</span>
 <span class="stamp">🥤</span>
 <span class="stamp">🥤</span>
@@ -121,6 +129,11 @@ font-weight:bold;
 
 <div class="reward-text">
 Collect 5 → Get 1 FREE 🎁
+</div>
+
+<div class="badge">
+<span class="valid" id="validRewards"></span><br>
+<span class="expired" id="expiredRewards"></span>
 </div>
 
 <div class="qr">
@@ -154,10 +167,6 @@ const BASE_URL = window.location.origin;
 const params = new URLSearchParams(window.location.search);
 const phone = params.get("phone");
 
-if(!phone){
-    alert("Invalid access ❌");
-}
-
 document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
@@ -172,33 +181,49 @@ async function loadCustomer() {
         });
 
         const data = await res.json();
-        if(!data || data.error) return;
 
         customerName = data.name;
         document.getElementById("name").innerText = data.name;
 
-        let remaining = data.rewardTarget - data.points;
+        // ✅ FIXED LOGIC
+        const current = data.points % 5;
+        const remaining = current === 0 ? 5 : 5 - current;
 
-        document.getElementById("progress").innerText =
-        "You’ve Earned " + data.points + " Reward Points ✨\n" +
-        "Just " + remaining + " More to Enjoy Your Free Falooda 🎁";
+        let message = "";
 
+        if(data.validRewards > 0){
+            message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
+        } else {
+            message =
+            "You’ve Earned " + data.points + " Points ✨\n" +
+            "Just " + remaining + " More to Enjoy Free Falooda 🎁";
+        }
+
+        document.getElementById("progress").innerText = message;
+
+        // 🎯 STAMPS
         const stamps = document.querySelectorAll(".stamp");
 
         stamps.forEach((stamp, index)=>{
-            if(index < data.points){
+            if(index < current){
                 stamp.classList.add("filled");
             } else {
                 stamp.classList.remove("filled");
             }
         });
 
-    } catch {
-        console.log("Server error");
+        // 🎁 REWARD INFO
+        document.getElementById("validRewards").innerText =
+        data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
+
+        document.getElementById("expiredRewards").innerText =
+        data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
+
+    } catch (err) {
+        console.log("Error:", err);
     }
 }
 
-/* ✅ FINAL WHATSAPP SHARE (BEST VERSION) */
 function shareWhatsApp(){
 
     const message =
@@ -216,13 +241,9 @@ https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    let url;
-
-    if(isMobile){
-        url = "https://wa.me/?text=" + encodedMessage;
-    } else {
-        url = "https://web.whatsapp.com/send?text=" + encodedMessage;
-    }
+    let url = isMobile
+        ? "https://wa.me/?text=" + encodedMessage
+        : "https://web.whatsapp.com/send?text=" + encodedMessage;
 
     window.open(url, "_blank");
 }
