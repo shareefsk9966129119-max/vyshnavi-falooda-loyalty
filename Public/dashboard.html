@@ -78,32 +78,62 @@ font-size:14px;
 
 .qr{ margin-top:25px; }
 
+/* 🔥 UPDATED SECTION (LEFT-RIGHT FIX) */
 .extra-section{
-margin-top:30px;
-padding-top:20px;
+margin-top:40px;
+padding-top:25px;
 border-top:1px solid rgba(255,255,255,0.1);
+
 display:flex;
 justify-content:space-between;
+align-items:stretch;
 gap:20px;
-flex-wrap:wrap;
-text-align:center;
 }
 
-.extra-box{ flex:1; min-width:150px; }
+.extra-box{
+width:48%;
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:15px;
+text-align:center;
+
+box-shadow:0 0 15px rgba(255,204,0,0.08);
+transition:0.3s;
+}
+
+.extra-box:hover{
+transform:translateY(-5px);
+box-shadow:0 0 25px rgba(255,204,0,0.25);
+}
 
 .extra-box h3{ color:#ffcc00; margin-bottom:10px; }
 .extra-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
 
 .extra-box button{
 padding:10px 16px;
-border:none;border-radius:8px;
-background:#25D366;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,#25D366,#1ebe5d);
 color:white;
 cursor:pointer;
 font-weight:bold;
+transition:0.3s;
 }
 
-.extra-box button:hover{ background:#1ebe5d; }
+.extra-box button:hover{
+transform:scale(1.05);
+}
+
+/* 📱 MOBILE FIX */
+@media(max-width:600px){
+.extra-section{
+flex-direction:column;
+}
+
+.extra-box{
+width:100%;
+}
+}
 
 </style>
 </head>
@@ -185,7 +215,6 @@ async function loadCustomer() {
         customerName = data.name;
         document.getElementById("name").innerText = data.name;
 
-        // ✅ FIXED LOGIC
         const current = data.points % 5;
         const remaining = current === 0 ? 5 : 5 - current;
 
@@ -201,7 +230,6 @@ async function loadCustomer() {
 
         document.getElementById("progress").innerText = message;
 
-        // 🎯 STAMPS
         const stamps = document.querySelectorAll(".stamp");
 
         stamps.forEach((stamp, index)=>{
@@ -212,7 +240,6 @@ async function loadCustomer() {
             }
         });
 
-        // 🎁 REWARD INFO
         document.getElementById("validRewards").innerText =
         data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
 
