@@ -12,10 +12,54 @@ margin:0;
 background: radial-gradient(circle at top,#6b0044,#1a001d);
 color:white;
 display:flex;
-justify-content:center;
-align-items:flex-start;
+flex-direction:column;
+align-items:center;
 min-height:100vh;
 padding:20px 0;
+}
+
+/* ✅ NEW TOP BAR */
+.top-bar{
+width:90%;
+max-width:420px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+/* ✅ GLOW STATUS */
+#storeStatus{
+font-size:16px;
+font-weight:bold;
+padding:8px 15px;
+border-radius:20px;
+background:rgba(0,255,136,0.1);
+color:#00ff88;
+box-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
+animation: glow 1.5s infinite alternate;
+}
+
+/* 🔴 CLOSED STYLE */
+.closed{
+background:rgba(255,0,0,0.1) !important;
+color:#ff4d4d !important;
+box-shadow:0 0 10px #ff4d4d,0 0 25px #ff4d4d !important;
+}
+
+/* ✨ Glow animation */
+@keyframes glow{
+from{ box-shadow:0 0 5px; }
+to{ box-shadow:0 0 25px; }
+}
+
+/* ⏰ Date Time */
+#dateTime{
+font-size:14px;
+color:#ccc;
+background:rgba(255,255,255,0.05);
+padding:6px 12px;
+border-radius:10px;
 }
 
 .card{
@@ -37,13 +81,6 @@ border:1px solid rgba(255,200,0,0.2);
 h1{ color:#ffcc00; margin-bottom:10px; }
 #name{ margin-bottom:5px; font-size:20px; }
 #welcome{ color:#aaa; margin-bottom:10px; }
-
-/* 🟢 STORE STATUS */
-#storeStatus{
-margin-bottom:15px;
-font-size:18px;
-font-weight:bold;
-}
 
 .closedBox{
 margin-top:15px;
@@ -96,15 +133,12 @@ font-size:14px;
 
 .qr{ margin-top:25px; }
 
-/* EXTRA SECTION SAME */
 .extra-section{
 margin-top:40px;
 padding-top:25px;
 border-top:1px solid rgba(255,255,255,0.1);
-
 display:flex;
 justify-content:space-between;
-align-items:stretch;
 gap:20px;
 }
 
@@ -114,7 +148,6 @@ background:rgba(255,255,255,0.05);
 padding:20px;
 border-radius:15px;
 text-align:center;
-
 box-shadow:0 0 15px rgba(255,204,0,0.08);
 transition:0.3s;
 }
@@ -135,21 +168,11 @@ background:linear-gradient(45deg,#25D366,#1ebe5d);
 color:white;
 cursor:pointer;
 font-weight:bold;
-transition:0.3s;
-}
-
-.extra-box button:hover{
-transform:scale(1.05);
 }
 
 @media(max-width:600px){
-.extra-section{
-flex-direction:column;
-}
-
-.extra-box{
-width:100%;
-}
+.extra-section{ flex-direction:column; }
+.extra-box{ width:100%; }
 }
 
 </style>
@@ -157,12 +180,16 @@ width:100%;
 
 <body>
 
+<!-- ✅ NEW TOP BAR -->
+<div class="top-bar">
+<div id="storeStatus">Checking...</div>
+<div id="dateTime"></div>
+</div>
+
 <div class="card">
 
 <h1>Your Falooda Rewards 🥤</h1>
 
-<!-- 🟢 STORE STATUS -->
-<div id="storeStatus">Checking store...</div>
 <div class="closedBox" id="closedBox">
 🔴 Store is currently closed  
 Please visit later 🙏
@@ -224,85 +251,90 @@ const phone = params.get("phone");
 document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
-let customerName = "";
+/* ⏰ LIVE TIME */
+function updateTime(){
+document.getElementById("dateTime").innerText =
+new Date().toLocaleString();
+}
+setInterval(updateTime,1000);
+updateTime();
 
-// 🟢 STORE STATUS CHECK
+/* 🟢 STORE STATUS */
 async function checkStoreStatus(){
-    try {
-        const res = await fetch(BASE_URL + "/store-status");
-        const data = await res.json();
+try {
+const res = await fetch(BASE_URL + "/store-status");
+const data = await res.json();
 
-        const statusEl = document.getElementById("storeStatus");
-        const closedBox = document.getElementById("closedBox");
+const statusEl = document.getElementById("storeStatus");
+const closedBox = document.getElementById("closedBox");
 
-        if(data.status === "open"){
-            statusEl.innerText = "🟢 Store is OPEN";
-            statusEl.style.color = "#00e676";
-            closedBox.style.display = "none";
-        } else {
-            statusEl.innerText = "🔴 Store is CLOSED";
-            statusEl.style.color = "#ff5252";
-            closedBox.style.display = "block";
-        }
+if(data.status === "open"){
+statusEl.innerText = "🟢 OPEN";
+statusEl.classList.remove("closed");
+closedBox.style.display = "none";
+}else{
+statusEl.innerText = "🔴 CLOSED";
+statusEl.classList.add("closed");
+closedBox.style.display = "block";
+}
 
-    } catch {
-        document.getElementById("storeStatus").innerText = "Error loading store ❌";
-    }
+}catch{
+document.getElementById("storeStatus").innerText = "Error ❌";
+}
 }
 
 async function loadCustomer() {
-    try {
-        const res = await fetch(BASE_URL + "/get-customer", {
-            method:"POST",
-            headers:{ "Content-Type":"application/json" },
-            body:JSON.stringify({ phone })
-        });
+try {
+const res = await fetch(BASE_URL + "/get-customer", {
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ phone })
+});
 
-        const data = await res.json();
+const data = await res.json();
 
-        customerName = data.name;
-        document.getElementById("name").innerText = data.name;
+document.getElementById("name").innerText = data.name;
 
-        const current = data.points % 5;
-        const remaining = current === 0 ? 5 : 5 - current;
+const current = data.points % 5;
+const remaining = current === 0 ? 5 : 5 - current;
 
-        let message = "";
+let message = "";
 
-        if(data.validRewards > 0){
-            message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
-        } else {
-            message =
-            "You’ve Earned " + data.points + " Points ✨\n" +
-            "Just " + remaining + " More to Enjoy Free Falooda 🎁";
-        }
+if(data.validRewards > 0){
+message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
+} else {
+message =
+"You’ve Earned " + data.points + " Points ✨\n" +
+"Just " + remaining + " More to Enjoy Free Falooda 🎁";
+}
 
-        document.getElementById("progress").innerText = message;
+document.getElementById("progress").innerText = message;
 
-        const stamps = document.querySelectorAll(".stamp");
+const stamps = document.querySelectorAll(".stamp");
 
-        stamps.forEach((stamp, index)=>{
-            if(index < current){
-                stamp.classList.add("filled");
-            } else {
-                stamp.classList.remove("filled");
-            }
-        });
+stamps.forEach((stamp, index)=>{
+if(index < current){
+stamp.classList.add("filled");
+}else{
+stamp.classList.remove("filled");
+}
+});
 
-        document.getElementById("validRewards").innerText =
-        data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
+document.getElementById("validRewards").innerText =
+data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
 
-        document.getElementById("expiredRewards").innerText =
-        data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
+document.getElementById("expiredRewards").innerText =
+data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
 
-    } catch (err) {
-        console.log("Error:", err);
-    }
+} catch (err) {
+console.log("Error:", err);
+}
 }
 
 function shareWhatsApp(){
 
 const message =
-`Hi! I'm ${customerName} 👋
+`Hi! 👋
 
 I tried falooda at Vyshnavi Falooda 🥰
 It was super delicious 😋
@@ -323,7 +355,7 @@ let url = isMobile
 window.open(url, "_blank");
 }
 
-// 🔁 LOAD EVERYTHING
+/* LOAD */
 checkStoreStatus();
 loadCustomer();
 
