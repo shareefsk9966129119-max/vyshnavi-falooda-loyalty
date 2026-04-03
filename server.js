@@ -10,8 +10,12 @@ const app = express();
 // 🔐 TEMP OTP STORAGE
 const otpStore = {};
 
-// 🟢 STORE STATUS (NEW FEATURE)
-let storeStatus = "open"; // default open
+// 🟢 STORE STATUS
+let storeStatus = "open";
+
+// ⏰ STORE TIMING (NEW)
+let openTime = "12:00";
+let closeTime = "23:00";
 
 // Import Models
 const Customer = require("./models/Customer");
@@ -23,7 +27,7 @@ app.use(express.json());
 // Serve frontend
 app.use(express.static(path.join(__dirname, "Public")));
 
-// MongoDB Connection
+// MongoDB
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
@@ -34,14 +38,35 @@ app.get("/", (req, res) => {
 });
 
 
-// ================= STORE STATUS (NEW) =================
+// ================= STORE STATUS =================
 
-// Get store status
+// 🧠 AUTO TIME CHECK FUNCTION
+function checkStoreTiming() {
+    const now = new Date();
+    const currentTime = now.toTimeString().slice(0,5);
+
+    if (currentTime >= openTime && currentTime < closeTime) {
+        storeStatus = "open";
+    } else {
+        storeStatus = "closed";
+    }
+}
+
+// ⏰ RUN EVERY 1 MINUTE
+setInterval(checkStoreTiming, 60000);
+
+// GET STATUS
 app.get("/store-status", (req, res) => {
-    res.json({ status: storeStatus });
+    checkStoreTiming(); // always check before sending
+
+    res.json({
+        status: storeStatus,
+        openTime,
+        closeTime
+    });
 });
 
-// Update store status (Admin)
+// UPDATE STATUS (Manual Override)
 app.post("/store-status", (req, res) => {
     const { status } = req.body;
 
@@ -57,10 +82,28 @@ app.post("/store-status", (req, res) => {
     });
 });
 
+// ⏰ SAVE TIMING (NEW API)
+app.post("/store-timing", (req, res) => {
+    const { openTime: o, closeTime: c } = req.body;
+
+    if (!o || !c) {
+        return res.status(400).json({ message: "Time required ❌" });
+    }
+
+    openTime = o;
+    closeTime = c;
+
+    res.json({
+        message: "Store timing updated ✅",
+        openTime,
+        closeTime
+    });
+});
+
 
 // ================= CUSTOMER =================
 
-// 🆕 Add Customer
+// ADD CUSTOMER
 app.post("/add-customer", async (req, res) => {
     try {
         const { name, phone, dob, password } = req.body;
@@ -72,9 +115,7 @@ app.post("/add-customer", async (req, res) => {
         const existingCustomer = await Customer.findOne({ phone });
 
         if (existingCustomer) {
-            return res.json({
-                message: "Customer already exists ✅"
-            });
+            return res.json({ message: "Customer already exists ✅" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -90,16 +131,14 @@ app.post("/add-customer", async (req, res) => {
 
         await newCustomer.save();
 
-        res.json({
-            message: "Registered Successfully ✅"
-        });
+        res.json({ message: "Registered Successfully ✅" });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// 🔐 LOGIN
+// LOGIN
 app.post("/login-customer", async (req, res) => {
     try {
         const { phone, password } = req.body;
@@ -120,17 +159,14 @@ app.post("/login-customer", async (req, res) => {
             return res.json({ success: false, message: "Wrong password ❌" });
         }
 
-        res.json({
-            success: true,
-            message: "Login successful ✅"
-        });
+        res.json({ success: true, message: "Login successful ✅" });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// 🔐 SEND OTP
+// SEND OTP
 app.post("/send-otp", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -163,9 +199,7 @@ app.post("/send-otp", async (req, res) => {
             }
         });
 
-        res.json({
-            message: "OTP sent 📱"
-        });
+        res.json({ message: "OTP sent 📱" });
 
     } catch (error) {
         console.error(error.response?.data || error.message);
@@ -173,7 +207,7 @@ app.post("/send-otp", async (req, res) => {
     }
 });
 
-// 🔐 RESET PASSWORD
+// RESET PASSWORD
 app.post("/reset-password", async (req, res) => {
     try {
         const { phone, otp, newPassword } = req.body;
@@ -193,10 +227,7 @@ app.post("/reset-password", async (req, res) => {
 
         delete otpStore[phone];
 
-        res.json({
-            success: true,
-            message: "Password reset successful ✅"
-        });
+        res.json({ success: true, message: "Password reset successful ✅" });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -206,7 +237,6 @@ app.post("/reset-password", async (req, res) => {
 
 // ================= REWARD SYSTEM =================
 
-// Get Customer
 app.post("/get-customer", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -243,7 +273,7 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// Add Points
+// ADD POINTS
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;
