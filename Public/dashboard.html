@@ -15,20 +15,20 @@ display:flex;
 flex-direction:column;
 align-items:center;
 min-height:100vh;
-padding:10px 0; /* 🔼 reduced to move card UP */
+padding:20px 0;
 }
 
-/* ✅ FULL WIDTH TOP BAR */
+/* ✅ NEW TOP BAR */
 .top-bar{
-width:100%;
+width:90%;
+max-width:420px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:0 20px;
-margin-bottom:5px;
+margin-bottom:15px;
 }
 
-/* ✅ GLOW STATUS LEFT */
+/* ✅ GLOW STATUS */
 #storeStatus{
 font-size:16px;
 font-weight:bold;
@@ -53,7 +53,7 @@ from{ box-shadow:0 0 5px; }
 to{ box-shadow:0 0 25px; }
 }
 
-/* ⏰ RIGHT SIDE TIME */
+/* ⏰ Date Time */
 #dateTime{
 font-size:14px;
 color:#ccc;
@@ -76,7 +76,6 @@ box-shadow:
 0 0 60px rgba(255,150,0,0.15);
 
 border:1px solid rgba(255,200,0,0.2);
-margin-top:5px; /* 🔼 slight up position */
 }
 
 h1{ color:#ffcc00; margin-bottom:10px; }
@@ -181,7 +180,7 @@ font-weight:bold;
 
 <body>
 
-<!-- ✅ TOP BAR -->
+<!-- ✅ NEW TOP BAR -->
 <div class="top-bar">
 <div id="storeStatus">Checking...</div>
 <div id="dateTime"></div>
@@ -252,7 +251,7 @@ const phone = params.get("phone");
 document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
-/* ⏰ TIME */
+/* ⏰ LIVE TIME */
 function updateTime(){
 document.getElementById("dateTime").innerText =
 new Date().toLocaleString();
@@ -260,7 +259,7 @@ new Date().toLocaleString();
 setInterval(updateTime,1000);
 updateTime();
 
-/* 🟢 STORE */
+/* 🟢 STORE STATUS */
 async function checkStoreStatus(){
 try {
 const res = await fetch(BASE_URL + "/store-status");
@@ -278,14 +277,15 @@ statusEl.innerText = "🔴 CLOSED";
 statusEl.classList.add("closed");
 closedBox.style.display = "block";
 }
+
 }catch{
 document.getElementById("storeStatus").innerText = "Error ❌";
 }
 }
 
-async function loadCustomer(){
-try{
-const res = await fetch(BASE_URL + "/get-customer",{
+async function loadCustomer() {
+try {
+const res = await fetch(BASE_URL + "/get-customer", {
 method:"POST",
 headers:{ "Content-Type":"application/json" },
 body:JSON.stringify({ phone })
@@ -295,25 +295,72 @@ const data = await res.json();
 
 document.getElementById("name").innerText = data.name;
 
-}catch(err){
-console.log(err);
+const current = data.points % 5;
+const remaining = current === 0 ? 5 : 5 - current;
+
+let message = "";
+
+if(data.validRewards > 0){
+message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
+} else {
+message =
+"You’ve Earned " + data.points + " Points ✨\n" +
+"Just " + remaining + " More to Enjoy Free Falooda 🎁";
+}
+
+document.getElementById("progress").innerText = message;
+
+const stamps = document.querySelectorAll(".stamp");
+
+stamps.forEach((stamp, index)=>{
+if(index < current){
+stamp.classList.add("filled");
+}else{
+stamp.classList.remove("filled");
+}
+});
+
+document.getElementById("validRewards").innerText =
+data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
+
+document.getElementById("expiredRewards").innerText =
+data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
+
+} catch (err) {
+console.log("Error:", err);
 }
 }
 
 function shareWhatsApp(){
-const message=`Hi! 👋
 
-I tried falooda at Vyshnavi Falooda 😋
+const message =
+`Hi! 👋
 
-📍 https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
+I tried falooda at Vyshnavi Falooda 🥰
+It was super delicious 😋
 
-window.open("https://wa.me/?text="+encodeURIComponent(message));
+You must try once!
+
+📍 Location:
+https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
+
+const encodedMessage = encodeURIComponent(message);
+
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+let url = isMobile
+? "https://wa.me/?text=" + encodedMessage
+: "https://web.whatsapp.com/send?text=" + encodedMessage;
+
+window.open(url, "_blank");
 }
 
+/* LOAD */
 checkStoreStatus();
 loadCustomer();
 
 setInterval(checkStoreStatus,5000);
+setInterval(loadCustomer,3000);
 
 </script>
 
