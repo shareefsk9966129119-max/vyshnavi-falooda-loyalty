@@ -10,6 +10,9 @@ const app = express();
 // 🔐 TEMP OTP STORAGE
 const otpStore = {};
 
+// 🟢 STORE STATUS (NEW FEATURE)
+let storeStatus = "open"; // default open
+
 // Import Models
 const Customer = require("./models/Customer");
 
@@ -29,6 +32,31 @@ mongoose.connect(process.env.MONGO_URI)
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "Public", "index.html"));
 });
+
+
+// ================= STORE STATUS (NEW) =================
+
+// Get store status
+app.get("/store-status", (req, res) => {
+    res.json({ status: storeStatus });
+});
+
+// Update store status (Admin)
+app.post("/store-status", (req, res) => {
+    const { status } = req.body;
+
+    if (status !== "open" && status !== "closed") {
+        return res.status(400).json({ message: "Invalid status ❌" });
+    }
+
+    storeStatus = status;
+
+    res.json({
+        message: `Store is now ${status.toUpperCase()} ✅`,
+        status
+    });
+});
+
 
 // ================= CUSTOMER =================
 
@@ -57,7 +85,7 @@ app.post("/add-customer", async (req, res) => {
             dob,
             password: hashedPassword,
             points: 0,
-            rewards: [] // ✅ NEW
+            rewards: []
         });
 
         await newCustomer.save();
@@ -175,6 +203,7 @@ app.post("/reset-password", async (req, res) => {
     }
 });
 
+
 // ================= REWARD SYSTEM =================
 
 // Get Customer
@@ -214,7 +243,7 @@ app.post("/get-customer", async (req, res) => {
     }
 });
 
-// Add Points (FINAL LOGIC)
+// Add Points
 app.post("/add-points", async (req, res) => {
     try {
         const { phone, pointsToAdd } = req.body;
@@ -225,10 +254,8 @@ app.post("/add-points", async (req, res) => {
             return res.status(404).json({ message: "Customer not found ❌" });
         }
 
-        // ➕ Add points
         customer.points += pointsToAdd;
 
-        // 🧠 Calculate rewards
         const totalRewardsShouldBe = Math.floor(customer.points / 5);
         const currentRewards = customer.rewards.length;
 
@@ -255,6 +282,7 @@ app.post("/add-points", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // ================= SERVER =================
 

@@ -38,6 +38,24 @@ h1{ color:#ffcc00; margin-bottom:10px; }
 #name{ margin-bottom:5px; font-size:20px; }
 #welcome{ color:#aaa; margin-bottom:10px; }
 
+/* 🟢 STORE STATUS */
+#storeStatus{
+margin-bottom:15px;
+font-size:18px;
+font-weight:bold;
+}
+
+.closedBox{
+margin-top:15px;
+padding:15px;
+background:rgba(255,0,0,0.1);
+border:1px solid rgba(255,0,0,0.3);
+border-radius:10px;
+color:#ff5252;
+font-weight:bold;
+display:none;
+}
+
 #progress{
 margin-bottom:20px;
 color:#ccc;
@@ -78,7 +96,7 @@ font-size:14px;
 
 .qr{ margin-top:25px; }
 
-/* 🔥 UPDATED SECTION (LEFT-RIGHT FIX) */
+/* EXTRA SECTION SAME */
 .extra-section{
 margin-top:40px;
 padding-top:25px;
@@ -124,7 +142,6 @@ transition:0.3s;
 transform:scale(1.05);
 }
 
-/* 📱 MOBILE FIX */
 @media(max-width:600px){
 .extra-section{
 flex-direction:column;
@@ -143,6 +160,13 @@ width:100%;
 <div class="card">
 
 <h1>Your Falooda Rewards 🥤</h1>
+
+<!-- 🟢 STORE STATUS -->
+<div id="storeStatus">Checking store...</div>
+<div class="closedBox" id="closedBox">
+🔴 Store is currently closed  
+Please visit later 🙏
+</div>
 
 <h3 id="name"></h3>
 <p id="welcome">Welcome back 👋</p>
@@ -202,6 +226,30 @@ document.getElementById("qr").src =
 
 let customerName = "";
 
+// 🟢 STORE STATUS CHECK
+async function checkStoreStatus(){
+    try {
+        const res = await fetch(BASE_URL + "/store-status");
+        const data = await res.json();
+
+        const statusEl = document.getElementById("storeStatus");
+        const closedBox = document.getElementById("closedBox");
+
+        if(data.status === "open"){
+            statusEl.innerText = "🟢 Store is OPEN";
+            statusEl.style.color = "#00e676";
+            closedBox.style.display = "none";
+        } else {
+            statusEl.innerText = "🔴 Store is CLOSED";
+            statusEl.style.color = "#ff5252";
+            closedBox.style.display = "block";
+        }
+
+    } catch {
+        document.getElementById("storeStatus").innerText = "Error loading store ❌";
+    }
+}
+
 async function loadCustomer() {
     try {
         const res = await fetch(BASE_URL + "/get-customer", {
@@ -253,7 +301,7 @@ async function loadCustomer() {
 
 function shareWhatsApp(){
 
-    const message =
+const message =
 `Hi! I'm ${customerName} 👋
 
 I tried falooda at Vyshnavi Falooda 🥰
@@ -264,18 +312,22 @@ You must try once!
 📍 Location:
 https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
 
-    const encodedMessage = encodeURIComponent(message);
+const encodedMessage = encodeURIComponent(message);
 
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    let url = isMobile
-        ? "https://wa.me/?text=" + encodedMessage
-        : "https://web.whatsapp.com/send?text=" + encodedMessage;
+let url = isMobile
+? "https://wa.me/?text=" + encodedMessage
+: "https://web.whatsapp.com/send?text=" + encodedMessage;
 
-    window.open(url, "_blank");
+window.open(url, "_blank");
 }
 
+// 🔁 LOAD EVERYTHING
+checkStoreStatus();
 loadCustomer();
+
+setInterval(checkStoreStatus,5000);
 setInterval(loadCustomer,3000);
 
 </script>

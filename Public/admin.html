@@ -48,9 +48,20 @@ cursor:pointer;
 .sub{ background:red; color:white; }
 .update{ background:#ffcc00; color:black; }
 
+/* 🟢 NEW BUTTONS */
+.openBtn{ background:#00c853; color:white; }
+.closeBtn{ background:#d50000; color:white; }
+
 #count{
 font-size:22px;
 margin:0 10px;
+}
+
+/* 🟢 STATUS DISPLAY */
+#storeStatus{
+margin-top:20px;
+font-size:20px;
+font-weight:bold;
 }
 </style>
 
@@ -60,6 +71,16 @@ margin:0 10px;
 
 <h1>Admin Scanner 📷</h1>
 <p>Scan Customer QR OR Enter Phone</p>
+
+<!-- 🟢 STORE CONTROL -->
+<h2>Store Control</h2>
+
+<div>
+<button class="openBtn" onclick="setStoreStatus('open')">🟢 Open Store</button>
+<button class="closeBtn" onclick="setStoreStatus('closed')">🔴 Close Store</button>
+</div>
+
+<p id="storeStatus">Checking store status...</p>
 
 <div id="reader"></div>
 
@@ -84,32 +105,72 @@ margin:0 10px;
 
 <script>
 
-// 🔐 ADMIN SECURITY (FIXED)
-const ADMIN_PASSWORD = "1234"; // change later
+// 🔐 ADMIN SECURITY
+const ADMIN_PASSWORD = "1234";
 
 const enteredPassword = prompt("Enter Admin Password 🔐");
 
-// ❌ If wrong → STOP EVERYTHING
 if (enteredPassword !== ADMIN_PASSWORD) {
 
     alert("Access Denied ❌");
 
-    // Clear entire UI
     document.body.innerHTML = `
         <h1 style="color:red; margin-top:100px;">Access Denied ❌</h1>
         <p>You are not authorized to access this page</p>
     `;
 
-    // Stop JS execution completely
     throw new Error("Unauthorized Access");
 }
 
-// ✅ AUTO DETECT BASE URL
+// ✅ BASE URL
 const BASE_URL = window.location.origin;
 
 let scannedPhone = "";
 let currentPhone = "";
 let currentCount = 1;
+
+// 🟢 STORE STATUS FUNCTIONS
+
+async function getStoreStatus() {
+    try {
+        const res = await fetch(BASE_URL + "/store-status");
+        const data = await res.json();
+
+        const el = document.getElementById("storeStatus");
+
+        if (data.status === "open") {
+            el.innerText = "🟢 Store is OPEN";
+            el.style.color = "#00e676";
+        } else {
+            el.innerText = "🔴 Store is CLOSED";
+            el.style.color = "#ff5252";
+        }
+
+    } catch {
+        document.getElementById("storeStatus").innerText = "Error loading status ❌";
+    }
+}
+
+async function setStoreStatus(status) {
+    try {
+        const res = await fetch(BASE_URL + "/store-status", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ status })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+        getStoreStatus(); // refresh status
+
+    } catch {
+        alert("Error updating store ❌");
+    }
+}
 
 // 🔁 Change count
 function change(val){
@@ -179,14 +240,14 @@ async function loadCustomer(phone){
     }
 }
 
-// ✅ ENTER KEY SUPPORT
+// ENTER KEY
 document.getElementById("phoneInput").addEventListener("keypress", function(e) {
     if(e.key === "Enter"){
         loadCustomer();
     }
 });
 
-// ✅ UPDATE POINTS
+// UPDATE POINTS
 async function updatePoints(){
 
     if(!currentPhone){
@@ -217,6 +278,12 @@ async function updatePoints(){
         alert("Server error ❌");
     }
 }
+
+// 🟢 LOAD STATUS ON START
+getStoreStatus();
+
+// 🔁 AUTO REFRESH
+setInterval(getStoreStatus, 5000);
 
 </script>
 
