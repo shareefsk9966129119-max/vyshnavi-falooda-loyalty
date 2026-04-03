@@ -26,66 +26,19 @@ text-align:center;
 width:90%;
 max-width:420px;
 backdrop-filter: blur(12px);
+
 box-shadow:
 0 0 25px rgba(255,200,0,0.25),
 0 0 60px rgba(255,150,0,0.15);
+
 border:1px solid rgba(255,200,0,0.2);
 }
 
 h1{ color:#ffcc00; margin-bottom:10px; }
-
-/* 💎 NEW TOP BAR */
-.top-bar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:15px;
-padding:10px 15px;
-border-radius:12px;
-background:rgba(255,255,255,0.05);
-font-size:14px;
-}
-
-.badge-pill{
-padding:6px 14px;
-border-radius:20px;
-font-weight:bold;
-}
-
-.open-pill{
-background:#00e67620;
-color:#00e676;
-}
-
-.closed-pill{
-background:#ff525220;
-color:#ff5252;
-}
-
-/* 🔔 ALERTS */
-.alert-box{
-display:none;
-margin-bottom:10px;
-padding:10px;
-border-radius:10px;
-font-size:14px;
-}
-
-.closing-alert{
-background:#ff980020;
-color:#ff9800;
-}
-
-.offer-alert{
-background:#00e67620;
-color:#00e676;
-}
-
-/* EXISTING CODE BELOW (UNCHANGED) */
-
 #name{ margin-bottom:5px; font-size:20px; }
 #welcome{ color:#aaa; margin-bottom:10px; }
 
+/* 🟢 STORE STATUS */
 #storeStatus{
 margin-bottom:15px;
 font-size:18px;
@@ -148,6 +101,7 @@ font-size:14px;
 margin-top:40px;
 padding-top:25px;
 border-top:1px solid rgba(255,255,255,0.1);
+
 display:flex;
 justify-content:space-between;
 align-items:stretch;
@@ -160,6 +114,7 @@ background:rgba(255,255,255,0.05);
 padding:20px;
 border-radius:15px;
 text-align:center;
+
 box-shadow:0 0 15px rgba(255,204,0,0.08);
 transition:0.3s;
 }
@@ -169,15 +124,34 @@ transform:translateY(-5px);
 box-shadow:0 0 25px rgba(255,204,0,0.25);
 }
 
-.extra-box h3{ color:#ffcc00; }
+.extra-box h3{ color:#ffcc00; margin-bottom:10px; }
+.extra-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
+
 .extra-box button{
-padding:10px;
+padding:10px 16px;
 border:none;
 border-radius:10px;
-background:#25D366;
+background:linear-gradient(45deg,#25D366,#1ebe5d);
 color:white;
 cursor:pointer;
+font-weight:bold;
+transition:0.3s;
 }
+
+.extra-box button:hover{
+transform:scale(1.05);
+}
+
+@media(max-width:600px){
+.extra-section{
+flex-direction:column;
+}
+
+.extra-box{
+width:100%;
+}
+}
+
 </style>
 </head>
 
@@ -185,25 +159,9 @@ cursor:pointer;
 
 <div class="card">
 
-<!-- 💎 NEW TOP BAR -->
-<div class="top-bar">
-    <div id="liveTime"></div>
-    <div id="statusBadge" class="badge-pill">Loading</div>
-</div>
-
-<!-- 🔔 ALERTS -->
-<div id="closingAlert" class="alert-box closing-alert">
-⏰ Closing soon! Visit fast
-</div>
-
-<div id="offerAlert" class="alert-box offer-alert">
-🎉 We are OPEN! Come enjoy falooda
-</div>
-
 <h1>Your Falooda Rewards 🥤</h1>
 
-<!-- EXISTING UI CONTINUES SAME -->
-
+<!-- 🟢 STORE STATUS -->
 <div id="storeStatus">Checking store...</div>
 <div class="closedBox" id="closedBox">
 🔴 Store is currently closed  
@@ -241,6 +199,7 @@ Collect 5 → Get 1 FREE 🎁
 
 <div class="extra-box">
 <h3>📍 Visit Our Store</h3>
+<p>Vyshnavi Falooda, Vijayawada</p>
 <a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
 <button>Open Location 📍</button>
 </a>
@@ -248,7 +207,8 @@ Collect 5 → Get 1 FREE 🎁
 
 <div class="extra-box">
 <h3>🎯 Refer & Earn</h3>
-<button onclick="shareWhatsApp()">Share</button>
+<p>Share with friends & get rewards 🍨</p>
+<button onclick="shareWhatsApp()">Share on WhatsApp</button>
 </div>
 
 </div>
@@ -264,72 +224,106 @@ const phone = params.get("phone");
 document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
-/* 🕒 LIVE TIME */
-function updateTime(){
-    document.getElementById("liveTime").innerText =
-    new Date().toLocaleString();
-}
-setInterval(updateTime,1000);
-updateTime();
+let customerName = "";
 
-/* 🟢 STORE STATUS + PREMIUM */
+// 🟢 STORE STATUS CHECK
 async function checkStoreStatus(){
-    const res = await fetch(BASE_URL + "/store-status");
-    const data = await res.json();
+    try {
+        const res = await fetch(BASE_URL + "/store-status");
+        const data = await res.json();
 
-    const badge = document.getElementById("statusBadge");
-    const offer = document.getElementById("offerAlert");
+        const statusEl = document.getElementById("storeStatus");
+        const closedBox = document.getElementById("closedBox");
 
-    if(data.status === "open"){
-        badge.innerText = "🟢 OPEN";
-        badge.className = "badge-pill open-pill";
-        offer.style.display = "block";
-    }else{
-        badge.innerText = "🔴 CLOSED";
-        badge.className = "badge-pill closed-pill";
-        offer.style.display = "none";
-    }
+        if(data.status === "open"){
+            statusEl.innerText = "🟢 Store is OPEN";
+            statusEl.style.color = "#00e676";
+            closedBox.style.display = "none";
+        } else {
+            statusEl.innerText = "🔴 Store is CLOSED";
+            statusEl.style.color = "#ff5252";
+            closedBox.style.display = "block";
+        }
 
-    /* KEEP YOUR ORIGINAL LOGIC */
-    const statusEl = document.getElementById("storeStatus");
-    const closedBox = document.getElementById("closedBox");
-
-    if(data.status === "open"){
-        statusEl.innerText = "🟢 Store is OPEN";
-        statusEl.style.color = "#00e676";
-        closedBox.style.display = "none";
-    } else {
-        statusEl.innerText = "🔴 Store is CLOSED";
-        statusEl.style.color = "#ff5252";
-        closedBox.style.display = "block";
+    } catch {
+        document.getElementById("storeStatus").innerText = "Error loading store ❌";
     }
 }
 
 async function loadCustomer() {
-    const res = await fetch(BASE_URL + "/get-customer", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify({ phone })
-    });
+    try {
+        const res = await fetch(BASE_URL + "/get-customer", {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({ phone })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    document.getElementById("name").innerText = data.name;
+        customerName = data.name;
+        document.getElementById("name").innerText = data.name;
 
-    const current = data.points % 5;
+        const current = data.points % 5;
+        const remaining = current === 0 ? 5 : 5 - current;
 
-    document.querySelectorAll(".stamp").forEach((s,i)=>{
-        if(i<current) s.classList.add("filled");
-    });
+        let message = "";
 
-    document.getElementById("validRewards").innerText =
-    data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
+        if(data.validRewards > 0){
+            message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
+        } else {
+            message =
+            "You’ve Earned " + data.points + " Points ✨\n" +
+            "Just " + remaining + " More to Enjoy Free Falooda 🎁";
+        }
+
+        document.getElementById("progress").innerText = message;
+
+        const stamps = document.querySelectorAll(".stamp");
+
+        stamps.forEach((stamp, index)=>{
+            if(index < current){
+                stamp.classList.add("filled");
+            } else {
+                stamp.classList.remove("filled");
+            }
+        });
+
+        document.getElementById("validRewards").innerText =
+        data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
+
+        document.getElementById("expiredRewards").innerText =
+        data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
+
+    } catch (err) {
+        console.log("Error:", err);
+    }
 }
 
 function shareWhatsApp(){
-window.open("https://wa.me/?text=Try Vyshnavi Falooda!");
+
+const message =
+`Hi! I'm ${customerName} 👋
+
+I tried falooda at Vyshnavi Falooda 🥰
+It was super delicious 😋
+
+You must try once!
+
+📍 Location:
+https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
+
+const encodedMessage = encodeURIComponent(message);
+
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+let url = isMobile
+? "https://wa.me/?text=" + encodedMessage
+: "https://web.whatsapp.com/send?text=" + encodedMessage;
+
+window.open(url, "_blank");
 }
 
+// 🔁 LOAD EVERYTHING
 checkStoreStatus();
 loadCustomer();
 
