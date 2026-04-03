@@ -29,8 +29,8 @@ margin-top:20px;
 input{
 padding:10px;
 border-radius:8px;
-width:200px;
-margin:10px;
+width:250px;
+margin-top:15px;
 border:none;
 outline:none;
 }
@@ -48,76 +48,19 @@ cursor:pointer;
 .sub{ background:red; color:white; }
 .update{ background:#ffcc00; color:black; }
 
+/* 🟢 NEW BUTTONS */
+.openBtn{ background:#00c853; color:white; }
+.closeBtn{ background:#d50000; color:white; }
+
 #count{
 font-size:22px;
 margin:0 10px;
 }
 
-/* 🔥 PREMIUM TOGGLE */
-.toggle{
-position:relative;
-width:200px;
-height:60px;
-border-radius:40px;
-margin:20px auto;
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:18px;
-background:#222;
-transition:0.3s;
-}
-
-.slider{
-position:absolute;
-width:90px;
-height:50px;
-border-radius:30px;
-left:5px;
-transition:0.3s;
-background:#444;
-}
-
-.toggle.open{
-background:#e8f5e9;
-color:black;
-}
-
-.toggle.open .slider{
-left:105px;
-background:#1b5e20;
-}
-
-.toggle.closed{
-background:#2a1a1a;
-color:white;
-}
-
-.toggle.closed .slider{
-left:5px;
-background:#b71c1c;
-}
-
-#toggleText{
-z-index:2;
-}
-
-/* ⏰ TIME BOX */
-.time-box{
-margin-top:20px;
-}
-
-.saveBtn{
-background:#00c853;
-color:white;
-}
-
-/* STATUS TEXT */
+/* 🟢 STATUS DISPLAY */
 #storeStatus{
-margin-top:10px;
-font-size:18px;
+margin-top:20px;
+font-size:20px;
 font-weight:bold;
 }
 </style>
@@ -127,28 +70,17 @@ font-weight:bold;
 <body>
 
 <h1>Admin Scanner 📷</h1>
+<p>Scan Customer QR OR Enter Phone</p>
 
+<!-- 🟢 STORE CONTROL -->
 <h2>Store Control</h2>
 
-<!-- 🔥 TOGGLE -->
-<div id="toggleSwitch" class="toggle" onclick="toggleStore()">
-    <div class="slider"></div>
-    <span id="toggleText">OPEN</span>
+<div>
+<button class="openBtn" onclick="setStoreStatus('open')">🟢 Open Store</button>
+<button class="closeBtn" onclick="setStoreStatus('closed')">🔴 Close Store</button>
 </div>
 
-<p id="storeStatus"></p>
-
-<!-- ⏰ TIME CONTROL -->
-<div class="time-box">
-    <h3>Set Store Timing ⏰</h3>
-    <input type="time" id="openTime">
-    <input type="time" id="closeTime"><br>
-    <button class="saveBtn" onclick="saveTiming()">Save Timing</button>
-</div>
-
-<hr style="margin:30px 0; border:1px solid #444;">
-
-<p>Scan Customer QR OR Enter Phone</p>
+<p id="storeStatus">Checking store status...</p>
 
 <div id="reader"></div>
 
@@ -175,132 +107,183 @@ font-weight:bold;
 
 // 🔐 ADMIN SECURITY
 const ADMIN_PASSWORD = "1234";
+
 const enteredPassword = prompt("Enter Admin Password 🔐");
 
 if (enteredPassword !== ADMIN_PASSWORD) {
-    document.body.innerHTML = `<h1 style="color:red;margin-top:100px;">Access Denied ❌</h1>`;
-    throw new Error("Unauthorized");
+
+    alert("Access Denied ❌");
+
+    document.body.innerHTML = `
+        <h1 style="color:red; margin-top:100px;">Access Denied ❌</h1>
+        <p>You are not authorized to access this page</p>
+    `;
+
+    throw new Error("Unauthorized Access");
 }
 
+// ✅ BASE URL
 const BASE_URL = window.location.origin;
 
-let currentStatus = "open";
+let scannedPhone = "";
 let currentPhone = "";
 let currentCount = 1;
 
-// 🔥 TOGGLE FUNCTION
-async function toggleStore(){
+// 🟢 STORE STATUS FUNCTIONS
 
-    const newStatus = currentStatus === "open" ? "closed" : "open";
+async function getStoreStatus() {
+    try {
+        const res = await fetch(BASE_URL + "/store-status");
+        const data = await res.json();
 
-    const res = await fetch(BASE_URL + "/store-status",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ status:newStatus })
-    });
+        const el = document.getElementById("storeStatus");
 
-    const data = await res.json();
-    currentStatus = data.status;
+        if (data.status === "open") {
+            el.innerText = "🟢 Store is OPEN";
+            el.style.color = "#00e676";
+        } else {
+            el.innerText = "🔴 Store is CLOSED";
+            el.style.color = "#ff5252";
+        }
 
-    updateToggleUI();
-}
-
-// UI UPDATE
-function updateToggleUI(){
-    const toggle = document.getElementById("toggleSwitch");
-    const text = document.getElementById("toggleText");
-    const status = document.getElementById("storeStatus");
-
-    if(currentStatus === "open"){
-        toggle.className = "toggle open";
-        text.innerText = "OPEN";
-        status.innerText = "🟢 Store is OPEN";
-        status.style.color = "#00e676";
-    }else{
-        toggle.className = "toggle closed";
-        text.innerText = "CLOSED";
-        status.innerText = "🔴 Store is CLOSED";
-        status.style.color = "#ff5252";
+    } catch {
+        document.getElementById("storeStatus").innerText = "Error loading status ❌";
     }
 }
 
-// LOAD STATUS
-async function loadStatus(){
-    const res = await fetch(BASE_URL + "/store-status");
-    const data = await res.json();
-    currentStatus = data.status;
-    updateToggleUI();
+async function setStoreStatus(status) {
+    try {
+        const res = await fetch(BASE_URL + "/store-status", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ status })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+        getStoreStatus(); // refresh status
+
+    } catch {
+        alert("Error updating store ❌");
+    }
 }
 
-// ⏰ SAVE TIMING
-async function saveTiming(){
-    const openTime = document.getElementById("openTime").value;
-    const closeTime = document.getElementById("closeTime").value;
-
-    await fetch(BASE_URL + "/store-timing",{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ openTime, closeTime })
-    });
-
-    alert("Timing saved ✅");
-}
-
-// EXISTING FUNCTIONS (SAFE)
+// 🔁 Change count
 function change(val){
     currentCount += val;
     if(currentCount < 1) currentCount = 1;
     document.getElementById("count").innerText = currentCount;
 }
 
+// ✅ QR SCAN SUCCESS
 function onScanSuccess(decodedText) {
-    currentPhone = decodedText;
-    loadCustomer(currentPhone);
+
+    try {
+        const url = new URL(decodedText);
+        scannedPhone = url.searchParams.get("phone");
+    } catch {
+        scannedPhone = decodedText;
+    }
+
+    document.getElementById("result").innerText =
+    "Scanned Phone: " + scannedPhone;
+
+    loadCustomer(scannedPhone);
 }
 
-let scanner = new Html5QrcodeScanner("reader",{fps:10,qrbox:250});
+// ✅ START SCANNER
+let scanner = new Html5QrcodeScanner("reader", {
+    fps: 10,
+    qrbox: 250
+});
+
 scanner.render(onScanSuccess);
 
+// ✅ LOAD CUSTOMER
 async function loadCustomer(phone){
-    const res = await fetch(BASE_URL + "/get-customer",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({phone})
-    });
 
-    const data = await res.json();
+    if(!phone){
+        phone = document.getElementById("phoneInput").value;
+    }
 
-    if(data.message){
-        document.getElementById("points").innerText = "Not found ❌";
+    if(!phone){
         return;
     }
 
-    document.getElementById("name").innerText = data.name;
-    document.getElementById("points").innerText = "Points: "+data.points;
+    currentPhone = phone;
+
+    try {
+        const res = await fetch(BASE_URL + "/get-customer", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({phone})
+        });
+
+        const data = await res.json();
+
+        if(data.message){
+            document.getElementById("name").innerText = "";
+            document.getElementById("points").innerText = "Customer not found ❌";
+            return;
+        }
+
+        document.getElementById("name").innerText = data.name;
+        document.getElementById("points").innerText =
+        "Current Points: " + data.points;
+
+    } catch (err) {
+        alert("Server error ❌");
+    }
 }
 
+// ENTER KEY
+document.getElementById("phoneInput").addEventListener("keypress", function(e) {
+    if(e.key === "Enter"){
+        loadCustomer();
+    }
+});
+
+// UPDATE POINTS
 async function updatePoints(){
-    if(!currentPhone) return alert("Scan first ❌");
 
-    const res = await fetch(BASE_URL + "/add-points",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
-            phone: currentPhone,
-            pointsToAdd: currentCount
-        })
-    });
+    if(!currentPhone){
+        alert("Scan or enter customer first ❌");
+        return;
+    }
 
-    const data = await res.json();
-    alert(data.message);
+    try {
+        const res = await fetch(BASE_URL + "/add-points", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({
+                phone: currentPhone,
+                pointsToAdd: currentCount
+            })
+        });
 
-    loadCustomer(currentPhone);
-    currentCount = 1;
-    document.getElementById("count").innerText = 1;
+        const data = await res.json();
+
+        alert(data.message);
+
+        loadCustomer(currentPhone);
+
+        currentCount = 1;
+        document.getElementById("count").innerText = currentCount;
+
+    } catch (err) {
+        alert("Server error ❌");
+    }
 }
 
-// INIT
-loadStatus();
+// 🟢 LOAD STATUS ON START
+getStoreStatus();
+
+// 🔁 AUTO REFRESH
+setInterval(getStoreStatus, 5000);
 
 </script>
 
