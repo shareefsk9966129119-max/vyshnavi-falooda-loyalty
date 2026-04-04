@@ -18,7 +18,30 @@ min-height:100vh;
 padding:20px 0;
 }
 
+/* 🔥 TOP BAR */
+.top-bar{
+position:fixed;
+top:10px;
+left:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 20px;
+z-index:1000;
+}
+
+.status-box, .time-box{
+background:rgba(0,0,0,0.6);
+padding:10px 18px;
+border-radius:12px;
+font-weight:bold;
+backdrop-filter:blur(8px);
+box-shadow:0 0 15px rgba(255,200,0,0.2);
+}
+
 .card{
+margin-top:60px;
 background:rgba(30,30,30,0.85);
 padding:40px;
 border-radius:20px;
@@ -37,13 +60,6 @@ border:1px solid rgba(255,200,0,0.2);
 h1{ color:#ffcc00; margin-bottom:10px; }
 #name{ margin-bottom:5px; font-size:20px; }
 #welcome{ color:#aaa; margin-bottom:10px; }
-
-/* 🟢 STORE STATUS */
-#storeStatus{
-margin-bottom:15px;
-font-size:18px;
-font-weight:bold;
-}
 
 .closedBox{
 margin-top:15px;
@@ -150,12 +166,16 @@ transform:scale(1.05);
 
 <body>
 
+<!-- 🔥 TOP BAR -->
+<div class="top-bar">
+    <div id="storeStatus" class="status-box">Checking store...</div>
+    <div id="dateTime" class="time-box">Loading time...</div>
+</div>
+
 <div class="card">
 
 <h1>Your Falooda Rewards 🥤</h1>
 
-<!-- 🟢 STORE STATUS -->
-<div id="storeStatus">Checking store...</div>
 <div class="closedBox" id="closedBox">
 🔴 Store is currently closed  
 Please visit later 🙏
@@ -226,6 +246,15 @@ function playOpenSound(){
     audio.play();
 }
 
+// 🕒 DATE & TIME
+function updateDateTime(){
+    const now = new Date();
+    document.getElementById("dateTime").innerText =
+    now.toLocaleDateString() + " | " + now.toLocaleTimeString();
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
 // 🟢 STORE STATUS CHECK
 async function checkStoreStatus(){
     try {
@@ -242,12 +271,10 @@ async function checkStoreStatus(){
 
         if(data.status === "open"){
 
-            // 🔔 sound when opens
             if(prevStatus === "closed"){
                 playOpenSound();
             }
 
-            // 🟡 closing soon (30 min before)
             const [ch, cm] = data.closeTime.split(":");
             const closeMinutes = parseInt(ch)*60 + parseInt(cm);
 
@@ -277,8 +304,6 @@ async function checkStoreStatus(){
         document.getElementById("storeStatus").innerText = "Error loading store ❌";
     }
 }
-
-// (rest unchanged)
 
 async function loadCustomer() {
     try {
