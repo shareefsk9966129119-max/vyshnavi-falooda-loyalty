@@ -48,9 +48,12 @@ cursor:pointer;
 .sub{ background:red; color:white; }
 .update{ background:#ffcc00; color:black; }
 
-/* 🟢 NEW BUTTONS */
+/* 🟢 STORE BUTTONS */
 .openBtn{ background:#00c853; color:white; }
 .closeBtn{ background:#d50000; color:white; }
+
+/* 🆕 AUTO MODE BUTTON */
+.autoBtn{ background:#2196f3; color:white; }
 
 #count{
 font-size:22px;
@@ -78,6 +81,9 @@ font-weight:bold;
 <div>
 <button class="openBtn" onclick="setStoreStatus('open')">🟢 Open Store</button>
 <button class="closeBtn" onclick="setStoreStatus('closed')">🔴 Close Store</button>
+
+<!-- 🆕 AUTO MODE -->
+<button class="autoBtn" onclick="enableAuto()">⏰ Auto Mode</button>
 </div>
 
 <p id="storeStatus">Checking store status...</p>
@@ -129,8 +135,7 @@ let scannedPhone = "";
 let currentPhone = "";
 let currentCount = 1;
 
-// 🟢 STORE STATUS FUNCTIONS
-
+// 🟢 GET STORE STATUS
 async function getStoreStatus() {
     try {
         const res = await fetch(BASE_URL + "/store-status");
@@ -151,6 +156,7 @@ async function getStoreStatus() {
     }
 }
 
+// 🟢 SET STORE STATUS
 async function setStoreStatus(status) {
     try {
         const res = await fetch(BASE_URL + "/store-status", {
@@ -165,10 +171,28 @@ async function setStoreStatus(status) {
 
         alert(data.message);
 
-        getStoreStatus(); // refresh status
+        getStoreStatus();
 
     } catch {
         alert("Error updating store ❌");
+    }
+}
+
+// 🆕 ENABLE AUTO MODE
+async function enableAuto(){
+    try{
+        const res = await fetch(BASE_URL + "/auto-mode", {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+        getStoreStatus();
+
+    }catch{
+        alert("Error enabling auto ❌");
     }
 }
 
@@ -279,10 +303,10 @@ async function updatePoints(){
     }
 }
 
-// 🟢 LOAD STATUS ON START
+// LOAD STATUS
 getStoreStatus();
 
-// 🔁 AUTO REFRESH
+// AUTO REFRESH
 setInterval(getStoreStatus, 5000);
 
 </script>

@@ -101,7 +101,6 @@ font-size:14px;
 margin-top:40px;
 padding-top:25px;
 border-top:1px solid rgba(255,255,255,0.1);
-
 display:flex;
 justify-content:space-between;
 align-items:stretch;
@@ -114,7 +113,6 @@ background:rgba(255,255,255,0.05);
 padding:20px;
 border-radius:15px;
 text-align:center;
-
 box-shadow:0 0 15px rgba(255,204,0,0.08);
 transition:0.3s;
 }
@@ -143,13 +141,8 @@ transform:scale(1.05);
 }
 
 @media(max-width:600px){
-.extra-section{
-flex-direction:column;
-}
-
-.extra-box{
-width:100%;
-}
+.extra-section{ flex-direction:column; }
+.extra-box{ width:100%; }
 }
 
 </style>
@@ -225,6 +218,13 @@ document.getElementById("qr").src =
 "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
 
 let customerName = "";
+let prevStatus = "";
+
+// 🔔 SOUND
+function playOpenSound(){
+    const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+    audio.play();
+}
 
 // 🟢 STORE STATUS CHECK
 async function checkStoreStatus(){
@@ -235,20 +235,50 @@ async function checkStoreStatus(){
         const statusEl = document.getElementById("storeStatus");
         const closedBox = document.getElementById("closedBox");
 
+        const now = new Date();
+        const currentTime = now.toTimeString().slice(0,5);
+
+        let statusText = "";
+
         if(data.status === "open"){
-            statusEl.innerText = "🟢 Store is OPEN";
-            statusEl.style.color = "#00e676";
+
+            // 🔔 sound when opens
+            if(prevStatus === "closed"){
+                playOpenSound();
+            }
+
+            // 🟡 closing soon (30 min before)
+            const [ch, cm] = data.closeTime.split(":");
+            const closeMinutes = parseInt(ch)*60 + parseInt(cm);
+
+            const [nh, nm] = currentTime.split(":");
+            const nowMinutes = parseInt(nh)*60 + parseInt(nm);
+
+            if(closeMinutes - nowMinutes <= 30){
+                statusText = "🟡 Closing Soon";
+                statusEl.style.color = "#ffd600";
+            }else{
+                statusText = "🟢 Store is OPEN";
+                statusEl.style.color = "#00e676";
+            }
+
             closedBox.style.display = "none";
+
         } else {
-            statusEl.innerText = "🔴 Store is CLOSED";
+            statusText = "🔴 Store is CLOSED";
             statusEl.style.color = "#ff5252";
             closedBox.style.display = "block";
         }
+
+        statusEl.innerText = statusText;
+        prevStatus = data.status;
 
     } catch {
         document.getElementById("storeStatus").innerText = "Error loading store ❌";
     }
 }
+
+// (rest unchanged)
 
 async function loadCustomer() {
     try {
@@ -300,30 +330,17 @@ async function loadCustomer() {
 }
 
 function shareWhatsApp(){
-
 const message =
 `Hi! I'm ${customerName} 👋
 
 I tried falooda at Vyshnavi Falooda 🥰
-It was super delicious 😋
 
-You must try once!
+📍 https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
 
-📍 Location:
-https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada`;
-
-const encodedMessage = encodeURIComponent(message);
-
-const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-let url = isMobile
-? "https://wa.me/?text=" + encodedMessage
-: "https://web.whatsapp.com/send?text=" + encodedMessage;
-
-window.open(url, "_blank");
+window.open("https://wa.me/?text="+encodeURIComponent(message));
 }
 
-// 🔁 LOAD EVERYTHING
+// LOAD
 checkStoreStatus();
 loadCustomer();
 

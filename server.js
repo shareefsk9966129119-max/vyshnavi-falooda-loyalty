@@ -13,7 +13,10 @@ const otpStore = {};
 // 🟢 STORE STATUS
 let storeStatus = "open";
 
-// ⏰ STORE TIMING (NEW)
+// 🧠 MANUAL OVERRIDE (NEW)
+let manualOverride = false;
+
+// ⏰ STORE TIMING
 let openTime = "12:00";
 let closeTime = "23:00";
 
@@ -42,6 +45,9 @@ app.get("/", (req, res) => {
 
 // 🧠 AUTO TIME CHECK FUNCTION
 function checkStoreTiming() {
+
+    if (manualOverride) return; // 🔥 DO NOT override admin control
+
     const now = new Date();
     const currentTime = now.toTimeString().slice(0,5);
 
@@ -57,7 +63,7 @@ setInterval(checkStoreTiming, 60000);
 
 // GET STATUS
 app.get("/store-status", (req, res) => {
-    checkStoreTiming(); // always check before sending
+    checkStoreTiming();
 
     res.json({
         status: storeStatus,
@@ -66,7 +72,7 @@ app.get("/store-status", (req, res) => {
     });
 });
 
-// UPDATE STATUS (Manual Override)
+// UPDATE STATUS (ADMIN CONTROL)
 app.post("/store-status", (req, res) => {
     const { status } = req.body;
 
@@ -75,6 +81,7 @@ app.post("/store-status", (req, res) => {
     }
 
     storeStatus = status;
+    manualOverride = true; // 🔥 ADMIN CONTROL ACTIVE
 
     res.json({
         message: `Store is now ${status.toUpperCase()} ✅`,
@@ -82,7 +89,16 @@ app.post("/store-status", (req, res) => {
     });
 });
 
-// ⏰ SAVE TIMING (NEW API)
+// 🔁 BACK TO AUTO MODE (NEW)
+app.post("/auto-mode", (req, res) => {
+    manualOverride = false;
+
+    res.json({
+        message: "Auto mode enabled ⏰"
+    });
+});
+
+// ⏰ SAVE TIMING
 app.post("/store-timing", (req, res) => {
     const { openTime: o, closeTime: c } = req.body;
 
