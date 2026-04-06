@@ -8,20 +8,14 @@
 <style>
 body{
 font-family:Arial;
-font-family:"Poppins","Segoe UI",Arial,sans-serif;
 margin:0;
 background: radial-gradient(circle at top,#6b0044,#1a001d);
-background:
-radial-gradient(circle at 15% 10%,rgba(255,185,78,0.18),transparent 35%),
-radial-gradient(circle at 85% 0%,rgba(230,62,142,0.22),transparent 38%),
-linear-gradient(160deg,#150018 0%,#260025 45%,#090015 100%);
 color:white;
 display:flex;
 justify-content:center;
 align-items:flex-start;
 min-height:100vh;
 padding:20px 0;
-padding:20px 0 40px;
 }
 
 /* 🔥 TOP BAR */
@@ -35,20 +29,26 @@ justify-content:space-between;
 align-items:center;
 padding:0 20px;
 z-index:1000;
-box-sizing:border-box;
 }
 
 .status-box, .time-box{
 background:rgba(0,0,0,0.6);
-background:rgba(14,8,26,0.72);
 padding:10px 18px;
 border-radius:12px;
 font-weight:bold;
 backdrop-filter:blur(8px);
 box-shadow:0 0 15px rgba(255,200,0,0.2);
-box-shadow:
-0 10px 30px rgba(0,0,0,0.35),
-inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* 🔥 NEW CLOSED TEXT */
+.top-closed{
+margin-left:10px;
+background:rgba(255,0,0,0.15);
+padding:10px 15px;
+border-radius:10px;
+color:#ff5252;
+font-weight:bold;
+display:none;
 }
 
 /* 🔥 NEW MAIN LAYOUT */
@@ -57,10 +57,7 @@ display:flex;
 justify-content:center;
 align-items:flex-start;
 gap:20px;
-align-items:center;
-gap:24px;
 width:100%;
-margin-top:60px;
 margin-top:100px;
 }
 
@@ -68,63 +65,43 @@ margin-top:100px;
 .side-box{
 width:220px;
 background:rgba(255,255,255,0.05);
-width:240px;
-background:linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03));
 padding:20px;
 border-radius:15px;
-border-radius:18px;
 text-align:center;
 box-shadow:0 0 15px rgba(255,204,0,0.08);
 transition:0.3s;
-box-shadow:
-0 18px 35px rgba(0,0,0,0.35),
-0 0 20px rgba(255,204,0,0.12);
-transition:0.28s ease;
-border:1px solid rgba(255,255,255,0.12);
+margin-top:80px; /* moved down */
 }
 
 .side-box:hover{
 transform:translateY(-5px);
 box-shadow:0 0 25px rgba(255,204,0,0.25);
-transform:translateY(-6px) scale(1.01);
-box-shadow:
-0 24px 40px rgba(0,0,0,0.4),
-0 0 28px rgba(255,204,0,0.22);
 }
 
 .side-box h3{ color:#ffcc00; margin-bottom:10px; }
 .side-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
-.side-box h3{ color:#ffd86f; margin-bottom:10px; letter-spacing:0.3px; }
-.side-box p{ font-size:14px; margin-bottom:14px; color:#e3d7e9; }
 
 .side-box button{
 padding:10px 16px;
 border:none;
 border-radius:10px;
 background:linear-gradient(45deg,#25D366,#1ebe5d);
-background:linear-gradient(45deg,#26db79,#1ea65a);
 color:white;
 cursor:pointer;
 font-weight:bold;
 transition:0.3s;
-font-weight:700;
-transition:0.25s ease;
-box-shadow:0 8px 20px rgba(30,166,90,0.35);
 }
 
 .side-box button:hover{
 transform:scale(1.05);
-transform:scale(1.06);
 }
 
-/* 🔥 ORIGINAL CARD (UNCHANGED) */
+/* 🔥 ORIGINAL CARD */
 .card{
 margin-top:60px;
 background:rgba(30,30,30,0.85);
-background:linear-gradient(160deg,rgba(28,22,42,0.9),rgba(20,15,35,0.9));
 padding:40px;
 border-radius:20px;
-border-radius:24px;
 text-align:center;
 width:90%;
 max-width:420px;
@@ -133,33 +110,13 @@ backdrop-filter: blur(12px);
 box-shadow:
 0 0 25px rgba(255,200,0,0.25),
 0 0 60px rgba(255,150,0,0.15);
-0 25px 65px rgba(0,0,0,0.55),
-0 0 28px rgba(255,200,0,0.2),
-0 0 70px rgba(255,150,0,0.1);
 
 border:1px solid rgba(255,200,0,0.2);
-border:1px solid rgba(255,215,130,0.24);
 }
 
 h1{ color:#ffcc00; margin-bottom:10px; }
-h1{
-color:#ffd86f;
-margin-bottom:10px;
-text-shadow:0 8px 20px rgba(255,181,72,0.3);
-}
 #name{ margin-bottom:5px; font-size:20px; }
 #welcome{ color:#aaa; margin-bottom:10px; }
-
-.closedBox{
-margin-top:15px;
-padding:15px;
-background:rgba(255,0,0,0.1);
-border:1px solid rgba(255,0,0,0.3);
-border-radius:10px;
-color:#ff5252;
-font-weight:bold;
-display:none;
-}
 
 #progress{
 margin-bottom:20px;
@@ -174,9 +131,6 @@ display:inline-flex;justify-content:center;align-items:center;
 margin:8px;font-size:24px;
 background:#222;border:2px solid #ffcc00;
 box-shadow:0 0 10px rgba(255,204,0,0.3);
-background:linear-gradient(180deg,#2d263f,#1d1a2b);
-border:2px solid rgba(255,214,125,0.85);
-box-shadow:0 0 10px rgba(255,204,0,0.26);
 transition:0.3s;
 }
 
@@ -209,10 +163,10 @@ font-size:14px;
 .main-layout{
 flex-direction:column;
 align-items:center;
-margin-top:95px;
 }
 .side-box{
 width:90%;
+margin-top:10px;
 }
 }
 
@@ -223,11 +177,13 @@ width:90%;
 
 <!-- 🔥 TOP BAR -->
 <div class="top-bar">
-    <div id="storeStatus" class="status-box">Checking store...</div>
+    <div style="display:flex; align-items:center;">
+        <div id="storeStatus" class="status-box">Checking store...</div>
+        <div id="topClosed" class="top-closed">🔴 Please visit later 🙏</div>
+    </div>
     <div id="dateTime" class="time-box">Loading time...</div>
 </div>
 
-<!-- 🔥 NEW STRUCTURE -->
 <div class="main-layout">
 
 <!-- LEFT -->
@@ -235,7 +191,146 @@ width:90%;
 <h3>📍 Visit Our Store</h3>
 <p>Vyshnavi Falooda, Vijayawada</p>
 <a href="https://maps.google.com/?q=Vyshnavi+Falooda+Vijayawada" target="_blank">
-@@ -360,26 +378,26 @@ async function loadCustomer() {
+<button>Open Location 📍</button>
+</a>
+</div>
+
+<!-- CENTER -->
+<div class="card">
+
+<h1>Your Falooda Rewards 🥤</h1>
+
+<h3 id="name"></h3>
+<p id="welcome">Welcome back 👋</p>
+
+<p id="progress"></p>
+
+<div id="stamps">
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+<span class="stamp">🥤</span>
+</div>
+
+<div class="reward-text">
+Collect 5 → Get 1 FREE 🎁
+</div>
+
+<div class="badge">
+<span class="valid" id="validRewards"></span><br>
+<span class="expired" id="expiredRewards"></span>
+</div>
+
+<div class="qr">
+<h4>Show this QR to staff</h4>
+<img id="qr" width="160" style="border-radius:10px;">
+</div>
+
+</div>
+
+<!-- RIGHT -->
+<div class="side-box">
+<h3>🎯 Refer & Earn</h3>
+<p>Share with friends & get rewards 🍨</p>
+<button onclick="shareWhatsApp()">Share on WhatsApp</button>
+</div>
+
+</div>
+
+<script>
+const BASE_URL = window.location.origin;
+const params = new URLSearchParams(window.location.search);
+const phone = params.get("phone");
+
+document.getElementById("qr").src =
+"https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + phone;
+
+let customerName = "";
+let prevStatus = "";
+
+function playOpenSound(){
+    const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+    audio.play();
+}
+
+function updateDateTime(){
+    const now = new Date();
+    document.getElementById("dateTime").innerText =
+    now.toLocaleDateString() + " | " + now.toLocaleTimeString();
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
+async function checkStoreStatus(){
+    try {
+        const res = await fetch(BASE_URL + "/store-status");
+        const data = await res.json();
+
+        const statusEl = document.getElementById("storeStatus");
+        const closedBox = document.getElementById("topClosed");
+
+        if(data.status === "open"){
+            statusEl.innerText = "🟢 Store is OPEN";
+            statusEl.style.color = "#00e676";
+            closedBox.style.display = "none";
+        } else {
+            statusEl.innerText = "🔴 Store is CLOSED";
+            statusEl.style.color = "#ff5252";
+            closedBox.style.display = "block";
+        }
+
+        prevStatus = data.status;
+
+    } catch {
+        document.getElementById("storeStatus").innerText = "Error loading store ❌";
+    }
+}
+
+async function loadCustomer() {
+    try {
+        const res = await fetch(BASE_URL + "/get-customer", {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({ phone })
+        });
+
+        const data = await res.json();
+
+        customerName = data.name;
+        document.getElementById("name").innerText = data.name;
+
+        const current = data.points % 5;
+        const remaining = current === 0 ? 5 : 5 - current;
+
+        let message = "";
+
+        if(data.validRewards > 0){
+            message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
+        } else {
+            message =
+            "You’ve Earned " + data.points + " Points ✨\n" +
+            "Just " + remaining + " More to Enjoy Free Falooda 🎁";
+        }
+
+        document.getElementById("progress").innerText = message;
+
+        const stamps = document.querySelectorAll(".stamp");
+
+        stamps.forEach((stamp, index)=>{
+            if(index < current){
+                stamp.classList.add("filled");
+            } else {
+                stamp.classList.remove("filled");
+            }
+        });
+
+        document.getElementById("validRewards").innerText =
+        data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
+
+        document.getElementById("expiredRewards").innerText =
+        data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
+
     } catch (err) {
         console.log("Error:", err);
     }
@@ -257,9 +352,7 @@ loadCustomer();
 
 setInterval(checkStoreStatus,5000);
 setInterval(loadCustomer,3000);
-
 </script>
 
 </body>
-</html>
 </html>
