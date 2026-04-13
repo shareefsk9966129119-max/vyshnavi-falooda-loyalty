@@ -12,10 +12,9 @@ margin:0;
 background: radial-gradient(circle at top,#6b0044,#1a001d);
 color:white;
 display:flex;
-justify-content:center;
-align-items:flex-start;
+flex-direction:column;
+align-items:center;
 min-height:100vh;
-padding:20px 0;
 }
 
 /* 🔥 TOP BAR */
@@ -46,12 +45,10 @@ backdrop-filter:blur(10px);
 box-shadow:0 0 15px rgba(255,200,0,0.2);
 }
 
-/* 🔥 IMPROVED TIME BOX */
 .time-box{
 border:1px solid rgba(255,255,255,0.2);
 }
 
-/* 🔥 CLOSED TEXT (SOFT STYLE) */
 .top-closed{
 background:rgba(255,255,255,0.05);
 padding:8px 12px;
@@ -61,7 +58,7 @@ font-size:14px;
 display:none;
 }
 
-/* 🔥 MAIN LAYOUT */
+/* 🔥 MAIN */
 .main-layout{
 display:flex;
 justify-content:center;
@@ -69,6 +66,7 @@ align-items:stretch;
 gap:20px;
 width:100%;
 margin-top:100px;
+flex:1;
 }
 
 /* 🔥 SIDE BOX */
@@ -91,8 +89,8 @@ transform:translateY(-5px);
 box-shadow:0 0 25px rgba(255,204,0,0.25);
 }
 
-.side-box h3{ color:#ffcc00; margin-bottom:10px; }
-.side-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
+.side-box h3{ color:#ffcc00; }
+.side-box p{ color:#ccc; }
 
 .side-box button{
 padding:10px 16px;
@@ -127,20 +125,16 @@ box-shadow:
 border:1px solid rgba(255,200,0,0.2);
 }
 
-h1{ color:#ffcc00; margin-bottom:10px; }
-#name{ margin-bottom:10px; font-size:20px; }
+h1{ color:#ffcc00; }
 #welcome{ color:#aaa; margin-bottom:15px; }
 
-/* 🔥 IMPROVED SPACING */
 #progress{
 margin-bottom:25px;
 color:#ccc;
 white-space: pre-line;
-font-weight:500;
 line-height:1.6;
 }
 
-/* 🔥 REWARD ALIGNMENT FIX */
 #stamps{
 display:flex;
 justify-content:center;
@@ -152,35 +146,73 @@ flex-wrap:wrap;
 width:60px;height:60px;border-radius:50%;
 display:flex;
 justify-content:center;align-items:center;
-font-size:24px;
 background:#222;border:2px solid #ffcc00;
-box-shadow:0 0 10px rgba(255,204,0,0.3);
-transition:0.3s;
 }
 
 .filled{
 background:linear-gradient(45deg,#ffcc00,#ff9900);
 color:black;
-transform:scale(1.15);
-box-shadow:0 0 25px #ffcc00;
 }
 
 .reward-text{
 margin-top:20px;
-font-size:18px;
 color:#ffcc00;
 font-weight:bold;
-}
-
-.badge{
-margin-top:10px;
-font-size:14px;
 }
 
 .valid{ color:#00ff9c; }
 .expired{ color:#ff4d4d; }
 
-.qr{ margin-top:25px; }
+/* 🔥 FOOTER */
+.footer{
+width:100%;
+margin-top:60px;
+background:rgba(0,0,0,0.7);
+padding:40px 20px 20px;
+backdrop-filter:blur(10px);
+border-top:1px solid rgba(255,255,255,0.1);
+}
+
+.footer-container{
+display:flex;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:30px;
+max-width:1000px;
+margin:auto;
+}
+
+.footer-box{
+flex:1;
+min-width:200px;
+}
+
+.footer-box h3, .footer-box h4{
+color:#ffcc00;
+}
+
+.footer-box p{
+color:#ccc;
+font-size:14px;
+}
+
+.footer-box a{
+color:#ccc;
+text-decoration:none;
+}
+
+.footer-box a:hover{
+color:#ffcc00;
+}
+
+.footer-bottom{
+text-align:center;
+margin-top:20px;
+padding-top:10px;
+border-top:1px solid rgba(255,255,255,0.1);
+font-size:13px;
+color:#aaa;
+}
 
 /* 📱 MOBILE */
 @media(max-width:900px){
@@ -192,6 +224,10 @@ align-items:center;
 width:90%;
 margin-top:10px;
 }
+.footer-container{
+flex-direction:column;
+text-align:center;
+}
 }
 
 </style>
@@ -199,7 +235,6 @@ margin-top:10px;
 
 <body>
 
-<!-- 🔥 TOP BAR -->
 <div class="top-bar">
     <div class="top-left">
         <div id="storeStatus" class="status-box">Checking store...</div>
@@ -210,7 +245,6 @@ margin-top:10px;
 
 <div class="main-layout">
 
-<!-- LEFT -->
 <div class="side-box">
 <h3>📍 Visit Our Store</h3>
 <p>Vyshnavi Falooda, Vijayawada</p>
@@ -219,7 +253,6 @@ margin-top:10px;
 </a>
 </div>
 
-<!-- CENTER -->
 <div class="card">
 
 <h1>Your Falooda Rewards 🥤</h1>
@@ -241,19 +274,18 @@ margin-top:10px;
 Collect 5 → Get 1 FREE 🎁
 </div>
 
-<div class="badge">
+<div>
 <span class="valid" id="validRewards"></span><br>
 <span class="expired" id="expiredRewards"></span>
 </div>
 
-<div class="qr">
+<div>
 <h4>Show this QR to staff</h4>
 <img id="qr" width="160" style="border-radius:10px;">
 </div>
 
 </div>
 
-<!-- RIGHT -->
 <div class="side-box">
 <h3>🎯 Refer & Earn</h3>
 <p>Share with friends & get rewards 🍨</p>
@@ -261,6 +293,38 @@ Collect 5 → Get 1 FREE 🎁
 </div>
 
 </div>
+
+<!-- 🔥 FOOTER -->
+<footer class="footer">
+
+<div class="footer-container">
+
+<div class="footer-box">
+<h3>Vyshnavi Falooda</h3>
+<p>Serving happiness with every sip 🥤</p>
+<p><strong>Established:</strong> 2026</p>
+<p><strong>Owner:</strong> Shaik Shareef</p>
+</div>
+
+<div class="footer-box">
+<h4>Quick Links</h4>
+<p><a href="#">Privacy Policy</a></p>
+<p><a href="#">Terms & Conditions</a></p>
+</div>
+
+<div class="footer-box">
+<h4>Contact Us</h4>
+<p>Email: vyshnavifalooda@gmail.com</p>
+<p>For complaints & suggestions</p>
+</div>
+
+</div>
+
+<div class="footer-bottom">
+© 2026 Vyshnavi Falooda. All Rights Reserved.
+</div>
+
+</footer>
 
 <script>
 const BASE_URL = window.location.origin;
