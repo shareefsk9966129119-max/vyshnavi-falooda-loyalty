@@ -3,180 +3,214 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Your Rewards</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
-:root{
-  --bg-1:#120014;
-  --bg-2:#1d0627;
-  --bg-3:#320a2f;
-  --gold-1:#ffd36b;
-  --gold-2:#ffb347;
-  --gold-3:#ff8a00;
-  --white:rgba(255,255,255,0.92);
-  --muted:rgba(255,255,255,0.62);
-  --border:rgba(255,211,107,0.22);
-  --shadow:0 20px 60px rgba(0,0,0,0.45);
-}
-
-*{ box-sizing:border-box; }
-
 body{
-  font-family:'Poppins',sans-serif;
-  margin:0;
-  color:var(--white);
-  min-height:100vh;
-  padding:24px 0 40px;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  background:
-    radial-gradient(circle at top left, rgba(255,170,0,0.08), transparent 25%),
-    radial-gradient(circle at top right, rgba(255,0,102,0.12), transparent 28%),
-    linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+font-family:Arial;
+margin:0;
+background: radial-gradient(circle at top,#6b0044,#1a001d);
+color:white;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+min-height:100vh;
+padding:20px 0;
 }
 
-/* TOP BAR */
+/* 🔥 TOP BAR */
 .top-bar{
-  position:fixed;
-  top:16px;
-  left:0;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 20px;
-  z-index:1000;
+position:fixed;
+top:10px;
+left:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 20px;
+z-index:1000;
 }
 
-.status-box,.time-box{
-  background:rgba(255,255,255,0.07);
-  border:1px solid rgba(255,255,255,0.10);
-  padding:10px 16px;
-  border-radius:14px;
-  font-weight:600;
+.top-left{
+display:flex;
+align-items:center;
+gap:10px;
 }
 
+.status-box, .time-box{
+background:rgba(0,0,0,0.6);
+padding:10px 18px;
+border-radius:12px;
+font-weight:bold;
+backdrop-filter:blur(10px);
+box-shadow:0 0 15px rgba(255,200,0,0.2);
+}
+
+/* 🔥 IMPROVED TIME BOX */
+.time-box{
+border:1px solid rgba(255,255,255,0.2);
+}
+
+/* 🔥 CLOSED TEXT (SOFT STYLE) */
 .top-closed{
-  margin-left:10px;
-  background:rgba(255,70,70,0.10);
-  padding:10px 14px;
-  border-radius:12px;
-  color:#ff6b6b;
-  display:none;
+background:rgba(255,255,255,0.05);
+padding:8px 12px;
+border-radius:10px;
+color:#bbb;
+font-size:14px;
+display:none;
 }
 
-/* LAYOUT */
+/* 🔥 MAIN LAYOUT */
 .main-layout{
-  display:flex;
-  gap:20px;
-  margin-top:100px;
-  width:100%;
-  max-width:1200px;
+display:flex;
+justify-content:center;
+align-items:stretch;
+gap:20px;
+width:100%;
+margin-top:100px;
 }
 
-/* SIDE BOX */
+/* 🔥 SIDE BOX */
 .side-box{
-  width:230px;
-  padding:20px;
-  text-align:center;
-  border-radius:20px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.10);
-  backdrop-filter:blur(12px);
-  transition:0.3s;
-  margin-top:80px;
+width:220px;
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 0 15px rgba(255,204,0,0.08);
+transition:0.3s;
+margin-top:80px;
+display:flex;
+flex-direction:column;
+justify-content:center;
 }
 
 .side-box:hover{
-  transform:translateY(-6px);
+transform:translateY(-5px);
+box-shadow:0 0 25px rgba(255,204,0,0.25);
 }
 
-.side-box h3{
-  color:var(--gold-1);
-}
+.side-box h3{ color:#ffcc00; margin-bottom:10px; }
+.side-box p{ font-size:14px; margin-bottom:10px; color:#ccc; }
 
 .side-box button{
-  padding:10px 16px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(135deg,var(--gold-1),var(--gold-3));
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
+padding:10px 16px;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,#25D366,#1ebe5d);
+color:white;
+cursor:pointer;
+font-weight:bold;
+transition:0.3s;
 }
 
-/* CARD */
+.side-box button:hover{
+transform:scale(1.05);
+}
+
+/* 🔥 CENTER CARD */
 .card{
-  margin-top:50px;
-  padding:40px;
-  border-radius:30px;
-  max-width:460px;
-  width:100%;
-  text-align:center;
-  background:rgba(20,16,25,0.85);
-  border:1px solid var(--border);
+margin-top:60px;
+background:rgba(30,30,30,0.85);
+padding:40px;
+border-radius:20px;
+text-align:center;
+width:90%;
+max-width:420px;
+backdrop-filter: blur(12px);
+
+box-shadow:
+0 0 25px rgba(255,200,0,0.25),
+0 0 60px rgba(255,150,0,0.15);
+
+border:1px solid rgba(255,200,0,0.2);
 }
 
-h1{
-  background:linear-gradient(135deg,#fff,var(--gold-1));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
+h1{ color:#ffcc00; margin-bottom:10px; }
+#name{ margin-bottom:10px; font-size:20px; }
+#welcome{ color:#aaa; margin-bottom:15px; }
 
+/* 🔥 IMPROVED SPACING */
 #progress{
-  margin:20px 0;
-  white-space:pre-line;
+margin-bottom:25px;
+color:#ccc;
+white-space: pre-line;
+font-weight:500;
+line-height:1.6;
 }
 
-/* STAMPS */
+/* 🔥 REWARD ALIGNMENT FIX */
+#stamps{
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+}
+
 .stamp{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:inline-flex;
-  justify-content:center;
-  align-items:center;
-  margin:6px;
-  font-size:24px;
-  border:1px solid var(--gold-1);
+width:60px;height:60px;border-radius:50%;
+display:flex;
+justify-content:center;align-items:center;
+font-size:24px;
+background:#222;border:2px solid #ffcc00;
+box-shadow:0 0 10px rgba(255,204,0,0.3);
+transition:0.3s;
 }
 
 .filled{
-  background:linear-gradient(135deg,#ffe08a,#ff9200);
-  color:black;
+background:linear-gradient(45deg,#ffcc00,#ff9900);
+color:black;
+transform:scale(1.15);
+box-shadow:0 0 25px #ffcc00;
 }
 
-/* MOBILE */
-@media(max-width:900px){
-  .main-layout{
-    flex-direction:column;
-    align-items:center;
-  }
-  .side-box{
-    width:90%;
-    margin-top:0;
-  }
+.reward-text{
+margin-top:20px;
+font-size:18px;
+color:#ffcc00;
+font-weight:bold;
 }
+
+.badge{
+margin-top:10px;
+font-size:14px;
+}
+
+.valid{ color:#00ff9c; }
+.expired{ color:#ff4d4d; }
+
+.qr{ margin-top:25px; }
+
+/* 📱 MOBILE */
+@media(max-width:900px){
+.main-layout{
+flex-direction:column;
+align-items:center;
+}
+.side-box{
+width:90%;
+margin-top:10px;
+}
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- 🔥 TOP BAR -->
 <div class="top-bar">
-    <div style="display:flex; align-items:center;">
+    <div class="top-left">
         <div id="storeStatus" class="status-box">Checking store...</div>
-        <div id="topClosed" class="top-closed">🔴 Please visit later 🙏</div>
+        <div id="topClosed" class="top-closed">Please visit later 🙏</div>
     </div>
     <div id="dateTime" class="time-box">Loading time...</div>
 </div>
 
 <div class="main-layout">
 
+<!-- LEFT -->
 <div class="side-box">
 <h3>📍 Visit Our Store</h3>
 <p>Vyshnavi Falooda, Vijayawada</p>
@@ -185,6 +219,7 @@ h1{
 </a>
 </div>
 
+<!-- CENTER -->
 <div class="card">
 
 <h1>Your Falooda Rewards 🥤</h1>
@@ -218,6 +253,7 @@ Collect 5 → Get 1 FREE 🎁
 
 </div>
 
+<!-- RIGHT -->
 <div class="side-box">
 <h3>🎯 Refer & Earn</h3>
 <p>Share with friends & get rewards 🍨</p>
@@ -283,15 +319,26 @@ async function loadCustomer() {
         const current = data.points % 5;
         const remaining = current === 0 ? 5 : 5 - current;
 
-        let message = data.validRewards > 0
-            ? "🎉 You have " + data.validRewards + " FREE Falooda available!"
-            : "You’ve Earned " + data.points + " Points ✨\nJust " + remaining + " More to Enjoy Free Falooda 🎁";
+        let message = "";
+
+        if(data.validRewards > 0){
+            message = "🎉 You have " + data.validRewards + " FREE Falooda available!";
+        } else {
+            message =
+            "You’ve Earned " + data.points + " Points ✨\n" +
+            "Just " + remaining + " More to Enjoy Free Falooda 🎁";
+        }
 
         document.getElementById("progress").innerText = message;
 
         const stamps = document.querySelectorAll(".stamp");
+
         stamps.forEach((stamp, index)=>{
-            stamp.classList.toggle("filled", index < current);
+            if(index < current){
+                stamp.classList.add("filled");
+            } else {
+                stamp.classList.remove("filled");
+            }
         });
 
         document.getElementById("validRewards").innerText =
@@ -301,7 +348,7 @@ async function loadCustomer() {
         data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
 
     } catch (err) {
-        console.log(err);
+        console.log("Error:", err);
     }
 }
 
