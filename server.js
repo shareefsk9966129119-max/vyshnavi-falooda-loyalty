@@ -13,7 +13,7 @@ const otpStore = {};
 // 🟢 STORE STATUS
 let storeStatus = "open";
 
-// 🧠 MANUAL OVERRIDE
+// 🧠 MANUAL OVERRIDE (NEW)
 let manualOverride = false;
 
 // ⏰ STORE TIMING
@@ -27,24 +27,26 @@ const Customer = require("./models/Customer");
 app.use(cors());
 app.use(express.json());
 
-// ✅ FIXED: Serve frontend (IMPORTANT)
-app.use(express.static(path.join(__dirname, "public")));
+// Serve frontend
+app.use(express.static(path.join(__dirname, "Public")));
 
 // MongoDB
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected ✅"))
 .catch(err => console.log("MongoDB Error:", err));
 
-// ✅ FIXED DEFAULT ROUTE
+// Default Route
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "Public", "index.html"));
 });
 
 
 // ================= STORE STATUS =================
 
+// 🧠 AUTO TIME CHECK FUNCTION
 function checkStoreTiming() {
-    if (manualOverride) return;
+
+    if (manualOverride) return; // 🔥 DO NOT override admin control
 
     const now = new Date();
     const currentTime = now.toTimeString().slice(0,5);
@@ -56,6 +58,7 @@ function checkStoreTiming() {
     }
 }
 
+// ⏰ RUN EVERY 1 MINUTE
 setInterval(checkStoreTiming, 60000);
 
 // GET STATUS
@@ -69,7 +72,7 @@ app.get("/store-status", (req, res) => {
     });
 });
 
-// UPDATE STATUS
+// UPDATE STATUS (ADMIN CONTROL)
 app.post("/store-status", (req, res) => {
     const { status } = req.body;
 
@@ -78,7 +81,7 @@ app.post("/store-status", (req, res) => {
     }
 
     storeStatus = status;
-    manualOverride = true;
+    manualOverride = true; // 🔥 ADMIN CONTROL ACTIVE
 
     res.json({
         message: `Store is now ${status.toUpperCase()} ✅`,
@@ -86,7 +89,7 @@ app.post("/store-status", (req, res) => {
     });
 });
 
-// AUTO MODE
+// 🔁 BACK TO AUTO MODE (NEW)
 app.post("/auto-mode", (req, res) => {
     manualOverride = false;
 
@@ -95,7 +98,7 @@ app.post("/auto-mode", (req, res) => {
     });
 });
 
-// SAVE TIMING
+// ⏰ SAVE TIMING
 app.post("/store-timing", (req, res) => {
     const { openTime: o, closeTime: c } = req.body;
 
