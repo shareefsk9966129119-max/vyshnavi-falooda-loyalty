@@ -3,6 +3,7 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Rewards</title>
 
 <style>
@@ -249,6 +250,45 @@ padding-top:10px;
 border-top:1px solid rgba(255,255,255,0.1);
 font-size:13px;
 color:#aaa;
+}
+
+/* 📱 MOBILE FIX ONLY */
+@media screen and (max-width:768px){
+
+.main-layout{
+flex-direction:column !important;
+align-items:center;
+margin-top:120px;
+}
+
+.side-box{
+width:92% !important;
+margin:10px 0 !important;
+}
+
+.card{
+width:92% !important;
+margin-top:10px !important;
+}
+
+.main-layout > :nth-child(1){ order:2; }
+.main-layout > :nth-child(2){ order:1; }
+.main-layout > :nth-child(3){ order:3; }
+
+.top-bar{
+flex-direction:column !important;
+gap:8px;
+padding:10px;
+}
+
+.side-box button{
+width:100%;
+}
+
+#qr{
+width:140px;
+}
+
 }
 
 </style>
