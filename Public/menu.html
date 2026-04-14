@@ -82,12 +82,21 @@ html{
     box-shadow: 0 0 20px rgba(255,152,0,0.3);
 }
 
+/* 🔥 SIGNATURE SPECIAL CARD */
+.menu-card.signature {
+    max-width: 260px;
+    margin: auto;
+    text-align: center;
+    border: 1px solid gold;
+}
+
 /* Image */
 .item-img {
     width: 100%;
-    height: 130px;
-    object-fit: cover;
-    border-radius: 10px;
+    height: auto;
+    max-height: 260px;
+    object-fit: contain;
+    border-radius: 12px;
     margin-bottom: 10px;
 }
 
@@ -114,7 +123,7 @@ html{
     border: 1px solid gold;
 }
 
-/* Mobile optimization */
+/* Mobile */
 @media(max-width:600px){
     .menu-title {font-size:26px;}
     .menu-grid {
@@ -123,7 +132,7 @@ html{
 }
 </style>
 
-<!-- 🔥 Sticky Tabs -->
+<!-- Tabs -->
 <div class="category-tabs">
     <a href="#signature">Signature</a>
     <a href="#classic">Classic</a>
@@ -139,8 +148,19 @@ html{
 <!-- 🌟 SIGNATURE -->
 <h3 class="category" id="signature">🌟 Signature</h3>
 <div class="menu-grid">
-<div class="menu-card"><img src="images/Dry fruit.jpg" class="item-img"><div class="item-name">Dry Fruit Falooda</div><div class="price">250ml ₹89<br>300ml ₹109</div></div>
-<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Pineapple Falooda</div><div class="price">250ml ₹89<br>300ml ₹109</div></div>
+
+<div class="menu-card signature">
+<img src="images/Dry fruit.jpg" class="item-img">
+<div class="item-name">Dry Fruit Falooda</div>
+<div class="price">250ml ₹89<br>300ml ₹109</div>
+</div>
+
+<div class="menu-card signature">
+<img src="images/falooda.jpg" class="item-img">
+<div class="item-name">Pineapple Falooda</div>
+<div class="price">250ml ₹89<br>300ml ₹109</div>
+</div>
+
 </div>
 
 <!-- 🍦 CLASSIC -->
