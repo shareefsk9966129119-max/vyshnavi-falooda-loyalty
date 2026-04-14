@@ -1,0 +1,191 @@
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background:#0f0f0f;
+    color:#fff;
+}
+
+/* Smooth scroll */
+html{
+    scroll-behavior: smooth;
+}
+
+/* Sticky Tabs */
+.category-tabs {
+    position: sticky;
+    top: 0;
+    background: #0f0f0f;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    z-index: 100;
+}
+
+.category-tabs a {
+    text-decoration: none;
+    color: #fff;
+    padding: 6px 12px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.category-tabs a:hover {
+    background: #ff9800;
+    color: black;
+}
+
+/* Section */
+.menu-section {
+    padding: 40px 15px;
+}
+
+/* Title */
+.menu-title {
+    text-align:center;
+    font-size: 34px;
+    margin-bottom: 20px;
+    color: #ff9800;
+}
+
+/* Category */
+.category {
+    text-align:left;
+    margin: 25px 5px 10px;
+    color: #ff9800;
+    font-size: 20px;
+}
+
+/* Grid */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+/* Card */
+.menu-card {
+    background: linear-gradient(145deg, #1c1c1c, #111);
+    padding: 12px;
+    border-radius: 14px;
+    transition: 0.3s;
+    border: 1px solid #2a2a2a;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+}
+
+.menu-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: #ff9800;
+    box-shadow: 0 0 20px rgba(255,152,0,0.3);
+}
+
+/* Image */
+.item-img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* Name */
+.item-name {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+/* Price */
+.price {
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* Coming */
+.coming {
+    color: #ff5722;
+    font-size: 12px;
+}
+
+/* Premium */
+.premium {
+    border: 1px solid gold;
+}
+
+/* Mobile optimization */
+@media(max-width:600px){
+    .menu-title {font-size:26px;}
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<!-- 🔥 Sticky Tabs -->
+<div class="category-tabs">
+    <a href="#signature">Signature</a>
+    <a href="#classic">Classic</a>
+    <a href="#special">Special</a>
+    <a href="#premium">Premium</a>
+    <a href="#ultra">Ultra</a>
+    <a href="#coming">Coming</a>
+</div>
+
+<section class="menu-section">
+<h2 class="menu-title">🍧 Falooda Menu</h2>
+
+<!-- 🌟 SIGNATURE -->
+<h3 class="category" id="signature">🌟 Signature</h3>
+<div class="menu-grid">
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Dry Fruit Falooda</div><div class="price">250ml ₹89<br>300ml ₹109</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Pineapple Falooda</div><div class="price">250ml ₹89<br>300ml ₹109</div></div>
+</div>
+
+<!-- 🍦 CLASSIC -->
+<h3 class="category" id="classic">🍦 Classic</h3>
+<div class="menu-grid">
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Black Currant</div><div class="price">250ml ₹99<br>300ml ₹119</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Mango</div><div class="price">250ml ₹99<br>300ml ₹119</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Van Choco Chips</div><div class="price">250ml ₹99<br>300ml ₹119</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Traffic Jam</div><div class="price">250ml ₹99<br>300ml ₹119</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Fruit Punch</div><div class="price">250ml ₹99<br>300ml ₹119</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Kulfi</div><div class="price">250ml ₹99<br>300ml ₹119</div></div>
+</div>
+
+<!-- 👑 SPECIAL -->
+<h3 class="category" id="special">👑 Special</h3>
+<div class="menu-grid">
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Smart Raspberry</div><div class="price">250ml ₹99<br>300ml ₹129</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Honey Almond</div><div class="price">250ml ₹99<br>300ml ₹129</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Black Forest</div><div class="price">250ml ₹99<br>300ml ₹129</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Kesar Pista</div><div class="price">250ml ₹99<br>300ml ₹129</div></div>
+</div>
+
+<!-- 🔥 PREMIUM -->
+<h3 class="category" id="premium">🔥 Premium</h3>
+<div class="menu-grid">
+<div class="menu-card premium"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Oreo</div><div class="price">250ml ₹109<br>300ml ₹139</div></div>
+<div class="menu-card premium"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Chocolate Ganache</div><div class="price">250ml ₹109<br>300ml ₹139</div></div>
+<div class="menu-card premium"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Fruit Ninja</div><div class="price">250ml ₹109<br>300ml ₹139</div></div>
+</div>
+
+<!-- 💎 ULTRA -->
+<h3 class="category" id="ultra">💎 Ultra Premium</h3>
+<div class="menu-grid">
+<div class="menu-card premium"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Belgium Chocolate</div><div class="price">250ml ₹119<br>300ml ₹159</div></div>
+<div class="menu-card premium"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Mississippi Dark Chocolate</div><div class="price">250ml ₹119<br>300ml ₹159</div></div>
+<div class="menu-card premium"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Biscoff</div><div class="price">250ml ₹119<br>300ml ₹159</div></div>
+</div>
+
+<!-- ⏳ COMING -->
+<h3 class="category" id="coming">⏳ Coming Soon</h3>
+<div class="menu-grid">
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Gulab Jamun Falooda</div><div class="coming">Coming Soon</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Badam Milk Falooda</div><div class="coming">Coming Soon</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Honey Cake Falooda</div><div class="coming">Coming Soon</div></div>
+<div class="menu-card"><img src="images/falooda.jpg" class="item-img"><div class="item-name">Rasgulla</div><div class="coming">Coming Soon</div></div>
+</div>
+
+</section>
