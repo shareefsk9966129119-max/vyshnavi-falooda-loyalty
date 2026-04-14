@@ -53,6 +53,12 @@ z-index:1000;
 display:flex;
 align-items:center;
 gap:10px;
+flex:1;   /* ✅ ADD THIS LINE */
+}
+
+.time-box{
+border:1px solid rgba(255,255,255,0.2);
+margin-left:auto;   /* ✅ ADD THIS LINE */
 }
 
 .status-box, .time-box{
@@ -83,12 +89,14 @@ justify-content:center;
 align-items:stretch;
 gap:20px;
 width:100%;
-margin-top:140px;
+max-width:1200px;      /* ✅ ADD THIS */
+margin:140px auto 0 auto;  /* ✅ CENTER BLOCK */
 flex:1;
 }
 
 .side-box{
-width:220px;
+width:260px;
+min-width:260px;
 background:rgba(255,255,255,0.05);
 padding:20px;
 border-radius:15px;
@@ -252,21 +260,50 @@ color:#aaa;
 /* 📱 MOBILE FIX ONLY */
 @media screen and (max-width:768px){
 
-/* ❌ Hide date/time on mobile */
+/* Hide date on mobile */
 .time-box{
 display:none !important;
 }
 
+/* Stack layout */
 .main-layout{
 flex-direction:column !important;
 align-items:center;
 margin-top:120px;
 }
 
-}
+/* Full width boxes */
 .side-box{
 width:92% !important;
 margin:10px 0 !important;
+}
+
+.card{
+width:92% !important;
+margin-top:10px !important;
+}
+
+/* Reorder (center first) */
+.main-layout > :nth-child(1){ order:2; }
+.main-layout > :nth-child(2){ order:1; }
+.main-layout > :nth-child(3){ order:3; }
+
+/* Header spacing */
+.top-bar{
+padding:10px;
+gap:10px;
+}
+
+/* Buttons full width */
+.side-box button{
+width:100%;
+}
+
+/* QR smaller */
+#qr{
+width:140px;
+}
+
 }
 
 .card{
@@ -279,11 +316,11 @@ margin-top:10px !important;
 .main-layout > :nth-child(3){ order:3; }
 
 .top-bar{
-flex-direction:column !important;
-gap:8px;
+flex-direction:row !important;
+justify-content:space-between;
+gap:10px;
 padding:10px;
 }
-
 .side-box button{
 width:100%;
 }
