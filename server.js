@@ -335,3 +335,15 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} 🚀`);
 });
+
+
+// ================= SELF PING (KEEP SERVER AWAKE) =================
+
+// dynamic import (safe for Node)
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+setInterval(() => {
+    fetch("https://vyshnavi-falooda-loyalty.onrender.com/")
+        .then(() => console.log("🔁 Self ping success"))
+        .catch(() => console.log("❌ Self ping failed"));
+}, 240000); // every 4 minutes
