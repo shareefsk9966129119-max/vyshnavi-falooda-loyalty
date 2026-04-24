@@ -12,6 +12,8 @@ const otpStore = {};
 
 // 🟢 STORE STATUS
 let storeStatus = "open";
+// 🍽 MENU VISIBILITY
+let menuVisible = true;
 
 // 🧠 MANUAL OVERRIDE
 let manualOverride = false;
@@ -111,6 +113,24 @@ app.post("/store-timing", (req, res) => {
         message: "Store timing updated ✅",
         openTime,
         closeTime
+    });
+});
+// ================= MENU CONTROL =================
+
+// GET MENU STATUS
+app.get("/menu-status", (req, res) => {
+    res.json({
+        menuVisible
+    });
+});
+
+// TOGGLE MENU (ADMIN)
+app.post("/toggle-menu", (req, res) => {
+    menuVisible = !menuVisible;
+
+    res.json({
+        message: menuVisible ? "Menu is now VISIBLE ✅" : "Menu is now HIDDEN ❌",
+        menuVisible
     });
 });
 

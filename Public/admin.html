@@ -86,6 +86,10 @@ font-weight:bold;
 <button class="autoBtn" onclick="enableAuto()">⏰ Auto Mode</button>
 </div>
 
+<button onclick="toggleMenu()" style="background:#9c27b0;color:white;">
+🍽 Toggle Menu
+</button>
+
 <p id="storeStatus">Checking store status...</p>
 
 <div id="reader"></div>
@@ -300,6 +304,22 @@ async function updatePoints(){
 
     } catch (err) {
         alert("Server error ❌");
+    }
+}
+
+// 🍽 TOGGLE MENU
+async function toggleMenu(){
+    try{
+        const res = await fetch(BASE_URL + "/toggle-menu", {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+    }catch{
+        alert("Error toggling menu ❌");
     }
 }
 
