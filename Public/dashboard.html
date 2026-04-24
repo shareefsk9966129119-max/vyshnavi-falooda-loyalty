@@ -389,7 +389,7 @@ Collect 5 → Get 1 FREE 🎁
 
 </div>
 <!-- 🍧 MENU SECTION -->
-<div style="width:100%; margin-top:30px; padding:10px;">
+<div id="menuSection" style="width:100%; margin-top:30px; padding:10px;">
 
     <h2 style="text-align:center; color:#ffcc00; margin-bottom:15px;">
         🍧 Our Menu
@@ -538,11 +538,30 @@ I tried falooda at Vyshnavi Falooda 🥰
 window.open("https://wa.me/?text="+encodeURIComponent(message));
 }
 
+// 🍽 CHECK MENU VISIBILITY
+async function checkMenu(){
+    try{
+        const res = await fetch(BASE_URL + "/menu-status");
+        const data = await res.json();
+
+        if(data.menuVisible){
+            document.getElementById("menuSection").style.display = "block";
+        }else{
+            document.getElementById("menuSection").style.display = "none";
+        }
+
+    }catch{
+        console.log("Menu check error");
+    }
+}
+
 checkStoreStatus();
 loadCustomer();
+checkMenu();   // 👈 ADD THIS LINE
 
 setInterval(checkStoreStatus,5000);
 setInterval(loadCustomer,3000);
+setInterval(checkMenu,3000);   // 👈 ADD THIS
 </script>
 
 </body>
