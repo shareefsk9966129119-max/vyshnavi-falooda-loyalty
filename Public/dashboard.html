@@ -189,6 +189,16 @@ filter: drop-shadow(0 0 10px rgba(255,215,0,1)) brightness(1.2);
 transform: scale(1.1);
 }
 
+/* 🔥 TITLE GLASS EFFECT */
+.title-glass{
+width:40px;
+vertical-align:middle;
+margin-left:8px;
+filter: drop-shadow(0 0 10px rgba(255,215,0,1)) brightness(1.2);
+transition:0.3s;
+}
+
+
 /* 👇 ADD HERE */
 .stamp img{
 width:45px;
@@ -363,7 +373,10 @@ Infosys SEZ, Annojiguda,<br>Ghatkesar, Hyderabad</p>
 
 <!-- CENTER -->
 <div class="card">
-<h1>Your Falooda Rewards <img src="images/Glass.jpg" width="80"></h1>
+<h1>
+Your Falooda Rewards 
+<img src="images/Glass.jpg" class="title-glass">
+</h1>
 <h3 id="name"></h3>
 <p id="welcome">Welcome back 👋</p>
 <p id="progress"></p>
