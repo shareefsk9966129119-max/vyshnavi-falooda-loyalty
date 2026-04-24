@@ -341,6 +341,37 @@ async function toggleMenu(){
     }
 }
 
+// ⏰ SAVE STORE TIMING
+async function saveTiming(){
+    const openTime = document.getElementById("openTime").value;
+    const closeTime = document.getElementById("closeTime").value;
+
+    if(!openTime || !closeTime){
+        alert("Enter both times ❌");
+        return;
+    }
+
+    try{
+        const res = await fetch(BASE_URL + "/store-timing", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                openTime,
+                closeTime
+            })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+    }catch{
+        alert("Error saving timing ❌");
+    }
+}
+
 // 🍽 GET MENU STATUS
 async function getMenuStatus(){
     try{
