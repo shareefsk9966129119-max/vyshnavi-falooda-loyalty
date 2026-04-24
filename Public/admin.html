@@ -92,6 +92,11 @@ font-weight:bold;
 
 <p id="storeStatus">Checking store status...</p>
 
+<p id="menuStatus" style="margin-top:10px;font-weight:bold;">
+Checking menu status...
+</p>
+
+
 <div id="reader"></div>
 
 <h3 id="result"></h3>
@@ -318,16 +323,40 @@ async function toggleMenu(){
 
         alert(data.message);
 
+        getMenuStatus(); // 🔥 add this line
+
     }catch{
         alert("Error toggling menu ❌");
     }
 }
 
+// 🍽 GET MENU STATUS
+async function getMenuStatus(){
+    try{
+        const res = await fetch(BASE_URL + "/menu-status");
+        const data = await res.json();
+
+        const el = document.getElementById("menuStatus");
+
+        if(data.menuVisible){
+            el.innerText = "🍽 Menu is VISIBLE";
+            el.style.color = "#00e676";
+        }else{
+            el.innerText = "🍽 Menu is HIDDEN";
+            el.style.color = "#ff5252";
+        }
+
+    }catch{
+        document.getElementById("menuStatus").innerText = "Error loading menu ❌";
+    }
+}
 // LOAD STATUS
 getStoreStatus();
+getMenuStatus();   // 👈 ADD THIS
 
 // AUTO REFRESH
 setInterval(getStoreStatus, 5000);
+setInterval(getMenuStatus, 3000);   // 👈 ADD THIS
 
 </script>
 
