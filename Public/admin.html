@@ -119,6 +119,8 @@ Checking menu status...
 <h3 id="name"></h3>
 <p id="points"></p>
 
+<div id="rewardDetails" style="margin-top:10px; font-size:14px;"></div>
+
 <div>
 <button class="sub" onclick="change(-1)">➖</button>
 <span id="count">1</span>
@@ -278,6 +280,53 @@ async function loadCustomer(phone){
         document.getElementById("name").innerText = data.name;
         document.getElementById("points").innerText =
         "Current Points: " + data.points;
+
+        // 🔥 SHOW REWARD DETAILS FOR ADMIN
+const box = document.getElementById("rewardDetails");
+
+if(data.rewards && data.rewards.length > 0){
+
+    box.innerHTML = data.rewards.map(r => {
+
+        const earned = new Date(r.earnedAt).toLocaleDateString();
+        const expiry = new Date(r.expiryDate).toLocaleDateString();
+
+        // 🔥 STATUS (USED / AVAILABLE)
+let status = "";
+if(r.used){
+    status = "✅ Used";
+}else{
+    status = "🎁 Available";
+}
+
+// 🔥 COLOR FOR EXPIRED
+let color = "white";
+if(new Date(r.expiryDate) < new Date()){
+    color = "#ff4d4d"; // red
+}
+
+        const daysLeft = Math.ceil(
+            (new Date(r.expiryDate) - new Date()) / (1000 * 60 * 60 * 24)
+        );
+
+        let warning = "";
+        if(daysLeft <= 3 && daysLeft >= 0 && !r.used){
+            warning = "⚠ Expiring soon!";
+        }
+
+        return `
+<div style="margin-top:8px; color:${color};">
+    📅 Earned: ${earned}<br>
+    ⏰ Expires: ${expiry}<br>
+    ${status}<br>
+    ${warning}
+</div>
+`;
+    }).join("");
+
+}else{
+    box.innerHTML = "No rewards yet";
+}
 
     } catch (err) {
         alert("Server error ❌");
