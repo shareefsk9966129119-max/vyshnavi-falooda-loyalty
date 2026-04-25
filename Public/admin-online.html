@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Admin Panel</title>
+
+<style>
+body{
+font-family:Arial;
+background:#1a001d;
+color:white;
+text-align:center;
+padding:20px;
+}
+
+h1{ color:#ffcc00; }
+
+.container{
+max-width:700px;
+margin:auto;
+margin-top:20px;
+}
+
+.order-card{
+background:#2a002f;
+padding:15px;
+margin-bottom:15px;
+border-radius:12px;
+text-align:left;
+}
+
+button{
+margin-top:10px;
+padding:10px 15px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.approve{ background:#00c853; color:white; }
+.reject{ background:#d50000; color:white; }
+
+input{
+width:100%;
+padding:10px;
+border-radius:8px;
+border:none;
+margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Online Orders Admin 📦</h1>
+
+<div class="container" id="ordersContainer">
+Loading orders...
+</div>
+
+<script>
+
+// 🔐 ADMIN SECURITY
+const ADMIN_PASSWORD = "1234";
+
+const enteredPassword = prompt("Enter Admin Password 🔐");
+
+if (enteredPassword !== ADMIN_PASSWORD) {
+    alert("Access Denied ❌");
+    document.body.innerHTML = "<h1 style='color:red;'>Access Denied ❌</h1>";
+    throw new Error("Unauthorized");
+}
+
+const BASE_URL = window.location.origin;
+
+/* LOAD ORDERS */
+async function loadOrders(){
+
+const res = await fetch(BASE_URL + "/all-orders");
+const data = await res.json();
+
+const container = document.getElementById("ordersContainer");
+
+if(data.length === 0){
+container.innerHTML = "No orders found";
+return;
+}
+
+container.innerHTML = data.map(order => {
+
+let color = "#ccc";
+if(order.status === "approved") color = "#00e676";
+if(order.status === "rejected") color = "#ff5252";
+
+return `
+<div class="order-card">
+
+<b>${order.platform.toUpperCase()}</b><br>
+Order ID: ${order.orderId}<br>
+Phone: ${order.phone}<br>
+Date: ${order.orderDate}<br>
+Status: <span style="color:${color}">${order.status}</span><br>
+
+<input type="text" id="msg-${order._id}" placeholder="Enter message (for reject)">
+
+<button class="approve" onclick="approveOrder('${order._id}')">
+Approve ✅
+</button>
+
+<button class="reject" onclick="rejectOrder('${order._id}')">
+Reject ❌
+</button>
+
+</div>
+`;
+
+}).join("");
+
+}
+
+/* APPROVE */
+async function approveOrder(id){
+
+await fetch(BASE_URL + "/approve-order",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ id })
+});
+
+alert("Order Approved ✅");
+loadOrders();
+}
+
+/* REJECT */
+async function rejectOrder(id){
+
+const msg = document.getElementById("msg-"+id).value || "Kindly check order details";
+
+await fetch(BASE_URL + "/reject-order",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ id, message: msg })
+});
+
+alert("Order Rejected ❌");
+loadOrders();
+}
+
+/* INIT */
+loadOrders();
+setInterval(loadOrders,5000);
+
+</script>
+
+</body>
+</html>

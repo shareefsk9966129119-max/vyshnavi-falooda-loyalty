@@ -24,6 +24,7 @@ let closeTime = "23:00";
 
 // Import Models
 const Customer = require("./models/Customer");
+const Order = require("./models/Order");
 
 // Middleware
 app.use(cors());
@@ -359,6 +360,146 @@ app.post("/add-points", async (req, res) => {
     }
 });
 
+// ================= ONLINE ORDER SYSTEM =================
+
+// SUBMIT ORDER
+app.post("/submit-order", async (req,res)=>{
+
+try{
+
+const { phone, orderId, orderDate, platform } = req.body;
+
+// ❌ DUPLICATE CHECK
+const existing = await Order.findOne({ orderId });
+
+if(existing){
+return res.json({ message: "Order already submitted ❌" });
+}
+
+// SAVE
+const order = new Order({
+phone,
+orderId,
+orderDate,
+platform
+});
+
+await order.save();
+
+res.json({ message: "Order submitted ✅" });
+
+}catch(err){
+res.status(500).json({ error: err.message });
+}
+
+});
+
+// GET CUSTOMER ORDERS
+app.post("/my-orders", async (req,res)=>{
+
+try{
+
+const { phone } = req.body;
+
+const orders = await Order.find({ phone }).sort({ createdAt:-1 });
+
+res.json(orders);
+
+}catch(err){
+res.status(500).json({ error: err.message });
+}
+
+});
+
+// ADMIN - GET ALL ORDERS
+app.get("/all-orders", async (req,res)=>{
+
+try{
+
+const orders = await Order.find().sort({ createdAt:-1 });
+
+res.json(orders);
+
+}catch(err){
+res.status(500).json({ error: err.message });
+}
+
+});
+
+// APPROVE ORDER
+app.post("/approve-order", async (req,res)=>{
+
+try{
+
+const { id } = req.body;
+
+const order = await Order.findById(id);
+
+if(!order) return res.json({ message:"Order not found ❌" });
+
+// 🔥 PREVENT DOUBLE APPROVE
+if(order.status !== "approved"){
+
+order.status = "approved";
+await order.save();
+
+// 🔥 ADD POINT TO CUSTOMER
+const customer = await Customer.findOne({ phone: order.phone });
+
+if(customer){
+customer.points += 1;
+
+// 🎁 REWARD LOGIC (VERY IMPORTANT)
+const totalRewardsShouldBe = Math.floor(customer.points / 5);
+const currentRewards = customer.rewards.filter(r => !r.used).length;
+
+if (totalRewardsShouldBe > currentRewards) {
+const newRewards = totalRewardsShouldBe - currentRewards;
+
+for (let i = 0; i < newRewards; i++) {
+customer.rewards.push({
+earnedAt: new Date(),
+used: false
+});
+}
+}
+
+await customer.save();
+}
+
+}
+
+res.json({ message:"Approved ✅" });
+
+}catch(err){
+res.status(500).json({ error: err.message });
+}
+
+});
+
+// REJECT ORDER
+app.post("/reject-order", async (req,res)=>{
+
+try{
+
+const { id, message } = req.body;
+
+const order = await Order.findById(id);
+
+if(!order) return res.json({ message:"Order not found ❌" });
+
+order.status = "rejected";
+order.message = message || "Kindly check order details";
+
+await order.save();
+
+res.json({ message:"Rejected ❌" });
+
+}catch(err){
+res.status(500).json({ error: err.message });
+}
+
+});
 
 // ================= SERVER =================
 

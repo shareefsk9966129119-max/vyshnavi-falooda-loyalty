@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Rewards</title>
+
+<style>
+body{
+font-family:Arial;
+margin:0;
+background: radial-gradient(circle at top,#6b0044,#1a001d);
+color:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+min-height:100vh;
+}
+
+.offer-banner{
+width:100%;
+background:linear-gradient(45deg,#ff9800,#ff5722);
+text-align:center;
+padding:10px;
+font-weight:bold;
+position:fixed;
+top:0;
+z-index:1001;
+}
+
+.top-bar{
+position:fixed;
+top:50px;
+left:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+padding:10px 20px;
+}
+
+.status-box,.time-box{
+background:rgba(0,0,0,0.6);
+padding:10px 18px;
+border-radius:12px;
+font-weight:bold;
+}
+
+.main-layout{
+display:flex;
+justify-content:center;
+margin-top:140px;
+width:100%;
+}
+
+.card{
+background:rgba(30,30,30,0.9);
+padding:35px;
+border-radius:20px;
+text-align:center;
+width:90%;
+max-width:420px;
+box-shadow:0 0 25px rgba(255,200,0,0.25);
+}
+
+h1{ color:#ffcc00; }
+
+#stamps{
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+margin-top:20px;
+}
+
+.stamp{
+width:60px;height:60px;border-radius:50%;
+background:#222;
+border:2px solid #ffcc00;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.stamp img{
+width:40px;
+opacity:0.5;
+}
+
+.filled{
+background:linear-gradient(45deg,#ffcc00,#ff9900);
+animation:glow 0.5s ease;
+}
+
+.filled img{
+opacity:1;
+}
+
+@keyframes glow{
+0%{transform:scale(0.8);}
+100%{transform:scale(1);}
+}
+
+/* INPUT */
+.input-box{
+margin-top:25px;
+text-align:left;
+}
+
+.input-box input, .input-box select{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:none;
+outline:none;
+}
+
+.submit-btn{
+margin-top:15px;
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,#00c853,#64dd17);
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.status-list{
+margin-top:20px;
+font-size:14px;
+text-align:left;
+color:#ccc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="offer-banner">
+🎉 Buy 4 Get 1 FREE Today!
+</div>
+
+<div class="top-bar">
+<div id="storeStatus" class="status-box">Checking store...</div>
+<div id="dateTime" class="time-box">Loading...</div>
+</div>
+
+<div class="main-layout">
+
+<div class="card">
+
+<h1>Your Falooda Rewards 🍨</h1>
+
+<h3 id="name"></h3>
+<p>Welcome back 👋</p>
+
+<p id="progress"></p>
+
+<div id="stamps">
+<span class="stamp"><img src="images/Glass.jpg"></span>
+<span class="stamp"><img src="images/Glass.jpg"></span>
+<span class="stamp"><img src="images/Glass.jpg"></span>
+<span class="stamp"><img src="images/Glass.jpg"></span>
+<span class="stamp"><img src="images/Glass.jpg"></span>
+</div>
+
+<p style="color:#ffcc00; margin-top:15px;">
+Collect 5 → Get 1 FREE 🎁
+</p>
+
+<!-- INPUT -->
+<div class="input-box">
+<h4>Enter Order Details 📦</h4>
+
+<select id="platform">
+<option value="">Select Platform</option>
+<option value="zomato">Zomato</option>
+<option value="swiggy">Swiggy</option>
+</select>
+
+<input type="text" id="orderId" placeholder="Enter Order ID">
+<input type="date" id="orderDate">
+
+<button class="submit-btn" onclick="submitOrder()">Submit for Approval 🚀</button>
+</div>
+
+<!-- STATUS -->
+<div class="status-list" id="orderStatus">
+No orders yet
+</div>
+
+</div>
+
+</div>
+
+<script>
+const BASE_URL = window.location.origin;
+const params = new URLSearchParams(window.location.search);
+const phone = params.get("phone");
+
+/* TIME */
+function updateDateTime(){
+const now = new Date();
+document.getElementById("dateTime").innerText =
+now.toLocaleDateString()+" | "+now.toLocaleTimeString();
+}
+setInterval(updateDateTime,1000);
+
+/* STORE */
+async function checkStoreStatus(){
+const res = await fetch(BASE_URL+"/store-status");
+const data = await res.json();
+document.getElementById("storeStatus").innerText =
+data.status === "open" ? "🟢 Store is OPEN" : "🔴 Store is CLOSED";
+}
+
+/* CUSTOMER */
+async function loadCustomer(){
+const res = await fetch(BASE_URL+"/get-customer",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ phone })
+});
+
+const data = await res.json();
+
+document.getElementById("name").innerText = data.name;
+
+const current = data.points % 5;
+const remaining = current === 0 ? 5 : 5-current;
+
+document.getElementById("progress").innerText =
+data.validRewards > 0
+? "🎉 You have "+data.validRewards+" FREE Falooda!"
+: "Complete "+remaining+" more orders for FREE 🎁";
+
+/* STAMPS */
+const stamps = document.querySelectorAll(".stamp");
+stamps.forEach((s,i)=>{
+if(i < current){ s.classList.add("filled"); }
+else{ s.classList.remove("filled"); }
+});
+}
+
+/* SUBMIT */
+async function submitOrder(){
+
+const platform = document.getElementById("platform").value;
+const orderId = document.getElementById("orderId").value.trim();
+const orderDate = document.getElementById("orderDate").value;
+
+if(!platform){
+alert("Select platform");
+return;
+}
+
+if(!orderId || !orderDate){
+alert("Enter all details");
+return;
+}
+
+/* VALIDATION */
+if(platform === "zomato"){
+if(orderId.length < 8 || orderId.length > 12){
+alert("Invalid Zomato Order ID");
+return;
+}
+}
+
+if(platform === "swiggy"){
+if(orderId.length < 12 || orderId.length > 18){
+alert("Invalid Swiggy Order ID");
+return;
+}
+}
+
+await fetch(BASE_URL+"/submit-order",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ phone, orderId, orderDate, platform })
+});
+
+alert("Order submitted for approval ✅");
+}
+
+/* LOAD ORDERS */
+async function loadOrders(){
+const res = await fetch(BASE_URL+"/my-orders",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ phone })
+});
+
+const data = await res.json();
+const box = document.getElementById("orderStatus");
+
+if(data.length === 0){
+box.innerText = "No orders yet";
+return;
+}
+
+box.innerHTML = data.map(o => {
+
+let color = "#ccc";
+if(o.status === "approved") color = "#00e676";
+if(o.status === "rejected") color = "#ff5252";
+
+return `
+<div style="margin-bottom:8px; color:${color};">
+${o.platform.toUpperCase()} - #${o.orderId} → ${o.status.toUpperCase()}
+<br>
+<span style="font-size:12px; color:#aaa;">
+${o.message || ""}
+</span>
+</div>
+`;
+
+}).join("");
+}
+
+/* INIT */
+checkStoreStatus();
+loadCustomer();
+loadOrders();
+
+setInterval(loadCustomer,4000);
+setInterval(loadOrders,4000);
+</script>
+
+</body>
+</html>
