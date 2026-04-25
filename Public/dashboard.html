@@ -393,6 +393,8 @@ Your Falooda Rewards
 Collect 5 → Get 1 FREE 🎁
 </div>
 
+<div id="rewardsBox" style="margin-top:15px; font-size:14px; color:#ccc;"></div>
+
 <div>
 <span class="valid" id="validRewards"></span><br>
 <span class="expired" id="expiredRewards"></span>
@@ -531,6 +533,7 @@ const data = await res.json();
 customerName = data.name;
 document.getElementById("name").innerText = data.name;
 
+// 🔢 POINTS CALCULATION
 const current = data.points % 5;
 const remaining = current === 0 ? 5 : 5 - current;
 
@@ -546,6 +549,7 @@ message =
 
 document.getElementById("progress").innerText = message;
 
+// 🎯 STAMPS UPDATE
 const stamps = document.querySelectorAll(".stamp");
 
 stamps.forEach((stamp,index)=>{
@@ -556,11 +560,52 @@ stamp.classList.remove("filled");
 }
 });
 
+// 🎁 REWARD COUNTS
 document.getElementById("validRewards").innerText =
 data.validRewards > 0 ? "🎁 Available Rewards: " + data.validRewards : "";
 
 document.getElementById("expiredRewards").innerText =
 data.expiredRewards > 0 ? "❌ Expired Rewards: " + data.expiredRewards : "";
+
+// 🔥 SHOW REWARD DETAILS (FIXED POSITION)
+const rewardsBox = document.getElementById("rewardsBox");
+
+if(data.rewards && data.rewards.length > 0){
+
+    rewardsBox.innerHTML = data.rewards.map(r => {
+
+        const earned = new Date(r.earnedAt).toLocaleDateString();
+        const expiry = new Date(r.expiryDate).toLocaleDateString();
+
+        const daysLeft = Math.ceil(
+            (new Date(r.expiryDate) - new Date()) / (1000 * 60 * 60 * 24)
+        );
+
+        let warning = "";
+        if(daysLeft <= 3 && daysLeft >= 0 && !r.used){
+            warning = "⚠ Expiring soon!";
+        }
+
+        let status = r.used ? "✅ Used" : "🎁 Available";
+
+        let color = "white";
+        if(new Date(r.expiryDate) < new Date()){
+            color = "#ff4d4d";
+        }
+
+        return `
+        <div style="margin-top:8px; color:${color};">
+            📅 Earned: ${earned}<br>
+            ⏰ Expires: ${expiry}<br>
+            ${status}<br>
+            ${warning}
+        </div>
+        `;
+    }).join("");
+
+}else{
+    rewardsBox.innerHTML = "No rewards yet";
+}
 
 }catch(err){
 console.log(err);

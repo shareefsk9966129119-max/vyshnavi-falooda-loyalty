@@ -115,6 +115,7 @@ app.post("/store-timing", (req, res) => {
         closeTime
     });
 });
+
 // ================= MENU CONTROL =================
 
 // GET MENU STATUS
@@ -284,23 +285,34 @@ app.post("/get-customer", async (req, res) => {
         const rewards = customer.rewards;
 
         const validRewards = rewards.filter(r => {
-            const diff = (Date.now() - new Date(r.earnedAt)) / (1000 * 60 * 60 * 24);
-            return diff <= 7 && !r.used;
-        });
+    const diff = (Date.now() - new Date(r.earnedAt)) / (1000 * 60 * 60 * 24);
+    return diff <= 30 && !r.used;
+});
 
-        const expiredRewards = rewards.filter(r => {
-            const diff = (Date.now() - new Date(r.earnedAt)) / (1000 * 60 * 60 * 24);
-            return diff > 7 && !r.used;
-        });
+const expiredRewards = rewards.filter(r => {
+    const diff = (Date.now() - new Date(r.earnedAt)) / (1000 * 60 * 60 * 24);
+    return diff > 30 && !r.used;
+});
 
         res.json({
-            name: customer.name,
-            phone: customer.phone,
-            points: customer.points,
-            totalRewards: rewards.length,
-            validRewards: validRewards.length,
-            expiredRewards: expiredRewards.length
-        });
+    name: customer.name,
+    phone: customer.phone,
+    points: customer.points,
+    totalRewards: rewards.length,
+    validRewards: validRewards.length,
+    expiredRewards: expiredRewards.length,
+
+    rewards: rewards.map(r => {
+        const expiryDate = new Date(r.earnedAt);
+        expiryDate.setDate(expiryDate.getDate() + 30);
+
+        return {
+            earnedAt: r.earnedAt,
+            expiryDate,
+            used: r.used
+        };
+    })
+});
 
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -321,7 +333,7 @@ app.post("/add-points", async (req, res) => {
         customer.points += pointsToAdd;
 
         const totalRewardsShouldBe = Math.floor(customer.points / 5);
-        const currentRewards = customer.rewards.length;
+        const currentRewards = customer.rewards.filter(r => !r.used).length;
 
         if (totalRewardsShouldBe > currentRewards) {
             const newRewards = totalRewardsShouldBe - currentRewards;
@@ -339,7 +351,7 @@ app.post("/add-points", async (req, res) => {
         res.json({
             message: "Points & rewards updated ✅",
             points: customer.points,
-            rewards: customer.rewards.length
+            rewards: customer.rewards.filter(r => !r.used).length
         });
 
     } catch (error) {
