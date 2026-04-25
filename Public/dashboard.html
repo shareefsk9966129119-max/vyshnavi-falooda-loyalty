@@ -450,7 +450,7 @@ Collect 5 → Get 1 FREE 🎁
 <h3>Vyshnavi Falooda</h3>
 <p>
 Serving happiness with every scoop
-<img src="images/Glass.jpg" width="30">
+<img src="images/scoop.jpg" width="30">
 </p>
 <p><strong>Established:</strong> 2026</p>
 <p><strong>Sole Proprietor:</strong> Shaik Shareef</p>
@@ -586,7 +586,15 @@ if(data.rewards && data.rewards.length > 0){
             warning = "⚠ Expiring soon!";
         }
 
-        let status = r.used ? "✅ Used" : "🎁 Available";
+        let status = "";
+
+if(r.used){
+    status = "✅ Used";
+}else if(new Date(r.expiryDate) < new Date()){
+    status = "❌ Expired";
+}else{
+    status = "🎁 Available";
+}
 
         let color = "white";
         if(new Date(r.expiryDate) < new Date()){
