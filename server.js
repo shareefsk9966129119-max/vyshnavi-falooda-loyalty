@@ -557,3 +557,7 @@ setInterval(() => {
         .then(() => console.log("🔁 Self ping success"))
         .catch(() => console.log("❌ Self ping failed"));
 }, 240000); // every 4 minutes
+
+app.get("/check-version", (req, res) => {
+    res.send("NEW VERSION WORKING");
+});
