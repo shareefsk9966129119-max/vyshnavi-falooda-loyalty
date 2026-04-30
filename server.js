@@ -375,20 +375,19 @@ app.post("/redeem-reward", async (req, res) => {
             return res.json({ message: "Customer not found ❌" });
         }
 
-        const reward = customer.rewards.find(r => r._id.toString() === rewardId);
-
-        if (!reward) {
-            return res.json({ message: "Reward not found ❌" });
+       const result = await Customer.updateOne(
+    { phone, "rewards._id": rewardId },
+    {
+        $set: {
+            "rewards.$.used": true,
+            "rewards.$.redeemedAt": new Date()
         }
+    }
+);
 
-        if (reward.used) {
-            return res.json({ message: "Already redeemed ❌" });
-        }
-
-        reward.used = true;
-reward.redeemedAt = new Date();   // 🔥 ADD THIS
-
-        await customer.save();
+if (result.modifiedCount === 0) {
+    return res.json({ message: "Reward not found or already redeemed ❌" });
+}
 
         res.json({ message: "Reward given successfully ✅" });
 
