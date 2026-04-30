@@ -307,11 +307,12 @@ const expiredRewards = rewards.filter(r => {
         const expiryDate = new Date(r.earnedAt);
         expiryDate.setDate(expiryDate.getDate() + 30);
 
-        return {
-            earnedAt: r.earnedAt,
-            expiryDate,
-            used: r.used
-        };
+       return {
+    _id: r._id,   // 🔥 ADD THIS LINE (VERY IMPORTANT)
+    earnedAt: r.earnedAt,
+    expiryDate,
+    used: r.used
+};
     })
 });
 
