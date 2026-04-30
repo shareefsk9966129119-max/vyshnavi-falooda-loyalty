@@ -495,5 +495,47 @@ async function redeemReward(phone, rewardId){
 
 </script>
 
+<div id="historyModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+z-index:2000;
+">
+
+<div style="
+background:#1a001d;
+padding:20px;
+border-radius:15px;
+width:90%;
+max-width:400px;
+max-height:80%;
+overflow-y:auto;
+">
+
+<h3 style="color:#ffcc00;">📜 Reward History</h3>
+
+<div id="historyContent"></div>
+
+<button onclick="closeHistory()" style="
+margin-top:10px;
+width:100%;
+padding:10px;
+background:#ff5252;
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;">
+Close
+</button>
+
+</div>
+</div>
+
 </body>
 </html>
