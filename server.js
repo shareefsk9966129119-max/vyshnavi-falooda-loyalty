@@ -335,7 +335,7 @@ app.post("/add-points", async (req, res) => {
         customer.points += pointsToAdd;
 
         const totalRewardsShouldBe = Math.floor(customer.points / 5);
-        const currentRewards = customer.rewards.filter(r => !r.used).length;
+        const currentRewards = customer.rewards.length;
 
         if (totalRewardsShouldBe > currentRewards) {
             const newRewards = totalRewardsShouldBe - currentRewards;
@@ -487,7 +487,7 @@ customer.points += 1;
 
 // 🎁 REWARD LOGIC (VERY IMPORTANT)
 const totalRewardsShouldBe = Math.floor(customer.points / 5);
-const currentRewards = customer.rewards.filter(r => !r.used).length;
+const currentRewards = customer.rewards.length;
 
 if (totalRewardsShouldBe > currentRewards) {
 const newRewards = totalRewardsShouldBe - currentRewards;
