@@ -332,7 +332,14 @@ if(new Date(r.expiryDate) < new Date()){
     📅 Earned: ${earned}<br>
     ⏰ Expires: ${expiryText}<br>
     ${status}<br>
-    ${warning}
+    ${warning}<br>
+
+    ${!r.used && expiry > today ? `
+    <button onclick="redeemReward('${currentPhone}', '${r._id}')"
+    style="margin-top:5px;padding:6px 12px;border:none;border-radius:8px;background:#00c853;color:white;cursor:pointer;">
+    🎯 Give Reward
+    </button>
+    ` : ""}
 </div>
 `;
     }).join("");
@@ -461,6 +468,36 @@ getMenuStatus();   // 👈 ADD THIS
 // AUTO REFRESH
 setInterval(getStoreStatus, 5000);
 setInterval(getMenuStatus, 3000);   // 👈 ADD THIS
+
+// ✅ ADD FUNCTION HERE 👇👇👇
+async function redeemReward(phone, rewardId){
+
+    if(!confirm("Are you sure to give this reward?")){
+        return;
+    }
+
+    try{
+        const res = await fetch(BASE_URL + "/redeem-reward", {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                phone,
+                rewardId
+            })
+        });
+
+        const data = await res.json();
+
+        alert(data.message);
+
+        loadCustomer(phone); // refresh
+
+    }catch{
+        alert("Error redeeming reward ❌");
+    }
+}
 
 </script>
 

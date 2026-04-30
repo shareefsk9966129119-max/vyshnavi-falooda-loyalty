@@ -360,6 +360,41 @@ app.post("/add-points", async (req, res) => {
     }
 });
 
+
+// ✅ ADD HERE (OUTSIDE)
+app.post("/redeem-reward", async (req, res) => {
+
+    try {
+        const { phone, rewardId } = req.body;
+
+        const customer = await Customer.findOne({ phone });
+
+        if (!customer) {
+            return res.json({ message: "Customer not found ❌" });
+        }
+
+        const reward = customer.rewards.find(r => r._id.toString() === rewardId);
+
+        if (!reward) {
+            return res.json({ message: "Reward not found ❌" });
+        }
+
+        if (reward.used) {
+            return res.json({ message: "Already redeemed ❌" });
+        }
+
+        reward.used = true;
+
+        await customer.save();
+
+        res.json({ message: "Reward given successfully ✅" });
+
+    } catch (error) {
+        res.json({ message: "Server error ❌" });
+    }
+});
+ 
+
 // ================= ONLINE ORDER SYSTEM =================
 
 // SUBMIT ORDER
