@@ -312,7 +312,7 @@ const expiredRewards = rewards.filter(r => {
     earnedAt: r.earnedAt,
     expiryDate,
     used: r.used,
-    redeemedAt: r.redeemedAt || null   // 🔥 ADD THIS
+    redeemedAt: r.usedAt || null  // 🔥 ADD THIS
 };
     })
 });
