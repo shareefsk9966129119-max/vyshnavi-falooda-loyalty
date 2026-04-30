@@ -369,6 +369,9 @@ app.post("/redeem-reward", async (req, res) => {
     try {
         const { phone, rewardId } = req.body;
 
+        console.log("PHONE:", phone);
+        console.log("REWARD ID:", rewardId);
+
         const customer = await Customer.findOne({ phone });
 
         if (!customer) {
