@@ -605,15 +605,18 @@ available.length > 0
 ? available.map(r => {
 
     const earned = new Date(r.earnedAt).toLocaleDateString();
-    const expiry = new Date(r.expiryDate).toLocaleDateString();
+const expiry = new Date(r.expiryDate).toLocaleDateString();
+const redeemed = r.redeemedAt 
+    ? new Date(r.redeemedAt).toLocaleDateString()
+    : "N/A";
 
-    return `
-    <div style="margin-top:8px;">
-        📅 Earned: ${earned}<br>
-        ⏰ Expires: ${expiry}<br>
-        🎁 Available
-    </div>
-    `;
+return `
+<div style="color:#ff5252; margin-top:8px;">
+    📅 Earned: ${earned}<br>
+    ⏰ Expiry: ${expiry}<br>
+    ✅ Redeemed: ${redeemed}
+</div>
+`;
 }).join("")
 : "No available rewards";
 
@@ -657,6 +660,32 @@ async function checkMenu(){
 checkStoreStatus();
 loadCustomer();
 checkMenu();   // 👈 ADD THIS LINE
+
+function toggleHistory(){
+    const box = document.getElementById("historyBox");
+
+    if(box.style.display === "none" || box.style.display === ""){
+        box.style.display = "block";
+
+        box.innerHTML =
+        window.redeemedRewards && window.redeemedRewards.length > 0
+        ? window.redeemedRewards.map(r => {
+
+            const earned = new Date(r.earnedAt).toLocaleDateString();
+
+            return `
+            <div style="color:#ff5252; margin-top:8px;">
+                📅 Earned: ${earned}<br>
+                ✅ Redeemed
+            </div>
+            `;
+        }).join("")
+        : "No redemption history";
+
+    }else{
+        box.style.display = "none";
+    }
+}
 
 setInterval(checkStoreStatus,5000);
 setInterval(loadCustomer,3000);
