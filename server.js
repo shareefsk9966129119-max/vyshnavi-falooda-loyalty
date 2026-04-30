@@ -383,7 +383,7 @@ app.post("/redeem-reward", async (req, res) => {
     {
         $set: {
             "rewards.$.used": true,
-            "rewards.$.redeemedAt": new Date()
+            "rewards.$.usedAt": new Date()
         }
     }
 );
