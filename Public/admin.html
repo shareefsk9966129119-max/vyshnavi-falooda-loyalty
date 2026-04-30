@@ -293,22 +293,9 @@ if(data.rewards && data.rewards.length > 0){
 
         // 🔥 STATUS (USED / AVAILABLE)
 let status = "";
-
-const today = new Date();
-const expiry = new Date(r.expiryDate);
-
-// ❌ Expired
-if(expiry < today){
-    status = "❌ Expired";
-}
-
-// ✅ Redeemed
-else if(r.used){
-    status = "✅ Redeemed";
-}
-
-// 🎁 Available
-else{
+if(r.used){
+    status = "✅ Used";
+}else{
     status = "🎁 Available";
 }
 
