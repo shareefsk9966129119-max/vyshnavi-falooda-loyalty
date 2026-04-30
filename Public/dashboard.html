@@ -406,13 +406,6 @@ cursor:pointer;">
 📜 Redemption History
 </button>
 
-<div id="historyBox" style="
-display:none;
-margin-top:10px;
-padding:10px;
-background:#2a002e;
-border-radius:10px;">
-</div>
 
 <div>
 <span class="valid" id="validRewards"></span><br>
@@ -611,7 +604,7 @@ const redeemed = r.redeemedAt
     : "N/A";
 
 return `
-<div style="color:#ff5252; margin-top:8px;">
+<div style="margin-top:8px;">
     📅 Earned: ${earned}<br>
     ⏰ Expiry: ${expiry}<br>
     ✅ Redeemed: ${redeemed}
@@ -662,35 +655,90 @@ loadCustomer();
 checkMenu();   // 👈 ADD THIS LINE
 
 function toggleHistory(){
-    const box = document.getElementById("historyBox");
+    const modal = document.getElementById("historyModal");
+    const content = document.getElementById("historyContent");
 
-    if(box.style.display === "none" || box.style.display === ""){
-        box.style.display = "block";
+    const redeemed = window.redeemedRewards || [];
 
-        box.innerHTML =
-        window.redeemedRewards && window.redeemedRewards.length > 0
-        ? window.redeemedRewards.map(r => {
+    // open modal
+    modal.style.display = "flex";
 
-            const earned = new Date(r.earnedAt).toLocaleDateString();
-
-            return `
-            <div style="color:#ff5252; margin-top:8px;">
-                📅 Earned: ${earned}<br>
-                ✅ Redeemed
-            </div>
-            `;
-        }).join("")
-        : "No redemption history";
-
-    }else{
-        box.style.display = "none";
+    if(redeemed.length === 0){
+        content.innerHTML = "No redemption history";
+        return;
     }
+
+    content.innerHTML = redeemed.map(r => {
+
+        const earned = new Date(r.earnedAt).toLocaleDateString();
+        const expiry = new Date(r.expiryDate).toLocaleDateString();
+        const redeemedDate = r.redeemedAt 
+            ? new Date(r.redeemedAt).toLocaleDateString()
+            : "N/A";
+
+        return `
+        <div style="margin-top:10px; padding:10px; background:#2a002e; border-radius:10px;">
+            📅 Earned: ${earned}<br>
+            ⏰ Expiry: ${expiry}<br>
+            ✅ Redeemed: ${redeemedDate}
+        </div>
+        `;
+    }).join("");
+}
+function closeHistory(){
+    document.getElementById("historyModal").style.display = "none";
 }
 
 setInterval(checkStoreStatus,5000);
 setInterval(loadCustomer,3000);
 setInterval(checkMenu,3000);   // 👈 ADD THIS
 </script>
+
+<!-- 🔥 HISTORY MODAL -->
+<div id="historyModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
+z-index:2000;
+">
+
+<div style="
+background:#1a001d;
+padding:20px;
+border-radius:15px;
+width:90%;
+max-width:400px;
+max-height:80%;
+overflow-y:auto;
+box-shadow:0 0 25px rgba(255,200,0,0.3);
+">
+
+<h3 style="color:#ffcc00; text-align:center;">
+📜 Redemption History
+</h3>
+
+<div id="historyContent"></div>
+
+<button onclick="closeHistory()" style="
+margin-top:15px;
+width:100%;
+padding:10px;
+background:#ff5252;
+color:white;
+border:none;
+border-radius:10px;
+cursor:pointer;">
+Close
+</button>
+
+</div>
+</div>
 
 </body>
 </html>

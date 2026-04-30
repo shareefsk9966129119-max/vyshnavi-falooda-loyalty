@@ -308,10 +308,11 @@ const expiredRewards = rewards.filter(r => {
         expiryDate.setDate(expiryDate.getDate() + 30);
 
        return {
-    _id: r._id,   // 🔥 ADD THIS LINE (VERY IMPORTANT)
+    _id: r._id,
     earnedAt: r.earnedAt,
     expiryDate,
-    used: r.used
+    used: r.used,
+    redeemedAt: r.redeemedAt || null   // 🔥 ADD THIS
 };
     })
 });
@@ -385,6 +386,7 @@ app.post("/redeem-reward", async (req, res) => {
         }
 
         reward.used = true;
+reward.redeemedAt = new Date();   // 🔥 ADD THIS
 
         await customer.save();
 
