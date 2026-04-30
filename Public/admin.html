@@ -288,61 +288,43 @@ if(data.rewards && data.rewards.length > 0){
 
     box.innerHTML = data.rewards.map(r => {
 
-        const earned = new Date(r.earnedAt).toLocaleDateString();
-const expiryText = new Date(r.expiryDate).toLocaleDateString();
+    const earned = new Date(r.earnedAt).toLocaleDateString();
+    const expiry = new Date(r.expiryDate);
+    const today = new Date();
 
-        // 🔥 STATUS (USED / AVAILABLE)
-let status = "";
-
-const today = new Date();
-const expiry = new Date(r.expiryDate);
-
-// ❌ Expired
-if(expiry < today){
-    status = "❌ Expired";
-}
-
-// ✅ Redeemed
-else if(r.used){
-    status = "✅ Redeemed";
-}
-
-// 🎁 Available
-else{
-    status = "🎁 Available";
-}
-
-// 🔥 COLOR FOR EXPIRED
-let color = "white";
-if(new Date(r.expiryDate) < new Date()){
-    color = "#ff4d4d"; // red
-}
-
-        const daysLeft = Math.ceil(
-            (new Date(r.expiryDate) - new Date()) / (1000 * 60 * 60 * 24)
-        );
-
-        let warning = "";
-        if(daysLeft <= 3 && daysLeft >= 0 && !r.used){
-            warning = "⚠ Expiring soon!";
-        }
+    // ✅ SHOW ONLY AVAILABLE
+    if(!r.used && expiry > today){
 
         return `
-<div style="margin-top:8px; color:${color};">
-    📅 Earned: ${earned}<br>
-    ⏰ Expires: ${expiryText}<br>
-    ${status}<br>
-    ${warning}<br>
+        <div style="
+            margin-top:10px;
+            padding:12px;
+            background:#2a002e;
+            border-radius:10px;
+        ">
+            📅 Earned: ${earned}<br>
+            ⏰ Expires: ${expiry.toLocaleDateString()}<br>
+            🎁 Available<br>
 
-    ${!r.used && expiry > today ? `
-    <button onclick="redeemReward('${currentPhone}', '${r._id}')"
-    style="margin-top:5px;padding:6px 12px;border:none;border-radius:8px;background:#00c853;color:white;cursor:pointer;">
-    🎯 Give Reward
-    </button>
-    ` : ""}
-</div>
-`;
-    }).join("");
+            <button onclick="redeemReward('${currentPhone}', '${r._id}')"
+                style="
+                    margin-top:8px;
+                    background:#00c853;
+                    border:none;
+                    padding:6px 10px;
+                    border-radius:6px;
+                    color:white;
+                    cursor:pointer;
+                ">
+                🎯 Give Reward
+            </button>
+        </div>
+        `;
+    }
+
+    return ""; // hide everything else
+
+}).join("");
 
 }else{
     box.innerHTML = "No rewards yet";
