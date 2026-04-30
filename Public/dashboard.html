@@ -599,10 +599,9 @@ available.length > 0
 
     const earned = new Date(r.earnedAt).toLocaleDateString();
 const expiry = new Date(r.expiryDate).toLocaleDateString();
-const redeemed = r.redeemedAt 
-    ? new Date(r.redeemedAt).toLocaleDateString()
+const redeemed = r.usedAt 
+    ? new Date(r.usedAt).toLocaleDateString()
     : "N/A";
-
 return `
 <div style="margin-top:8px;">
     📅 Earned: ${earned}<br>
@@ -672,9 +671,9 @@ function toggleHistory(){
 
         const earned = new Date(r.earnedAt).toLocaleDateString();
         const expiry = new Date(r.expiryDate).toLocaleDateString();
-        const redeemedDate = r.redeemedAt 
-            ? new Date(r.redeemedAt).toLocaleDateString()
-            : "N/A";
+        const redeemedDate = r.usedAt 
+    ? new Date(r.usedAt).toLocaleDateString()
+    : "N/A";
 
         return `
         <div style="margin-top:10px; padding:10px; background:#2a002e; border-radius:10px;">
