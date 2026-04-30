@@ -395,6 +395,25 @@ Collect 5 → Get 1 FREE 🎁
 
 <div id="rewardsBox" style="margin-top:15px; font-size:14px; color:#ccc;"></div>
 
+<button onclick="toggleHistory()" style="
+margin-top:10px;
+background:#ff5252;
+color:white;
+padding:8px 12px;
+border:none;
+border-radius:8px;
+cursor:pointer;">
+📜 Redemption History
+</button>
+
+<div id="historyBox" style="
+display:none;
+margin-top:10px;
+padding:10px;
+background:#2a002e;
+border-radius:10px;">
+</div>
+
 <div>
 <span class="valid" id="validRewards"></span><br>
 <span class="expired" id="expiredRewards"></span>
@@ -572,44 +591,31 @@ const rewardsBox = document.getElementById("rewardsBox");
 
 if(data.rewards && data.rewards.length > 0){
 
-    rewardsBox.innerHTML = data.rewards.map(r => {
+    const rewards = data.rewards || [];
 
-        const earned = new Date(r.earnedAt).toLocaleDateString();
-        const expiry = new Date(r.expiryDate).toLocaleDateString();
+// show ONLY available rewards
+const available = rewards.filter(r => !r.used);
+const redeemed = rewards.filter(r => r.used);
 
-        const daysLeft = Math.ceil(
-            (new Date(r.expiryDate) - new Date()) / (1000 * 60 * 60 * 24)
-        );
+// store redeemed rewards for history button
+window.redeemedRewards = redeemed;
 
-        let warning = "";
-        if(daysLeft <= 3 && daysLeft >= 0 && !r.used){
-            warning = "⚠ Expiring soon!";
-        }
+rewardsBox.innerHTML =
+available.length > 0
+? available.map(r => {
 
-        let status = "";
+    const earned = new Date(r.earnedAt).toLocaleDateString();
+    const expiry = new Date(r.expiryDate).toLocaleDateString();
 
-if(r.used){
-    status = "✅ Used";
-}else if(new Date(r.expiryDate) < new Date()){
-    status = "❌ Expired";
-}else{
-    status = "🎁 Available";
-}
-
-        let color = "white";
-        if(new Date(r.expiryDate) < new Date()){
-            color = "#ff4d4d";
-        }
-
-        return `
-        <div style="margin-top:8px; color:${color};">
-            📅 Earned: ${earned}<br>
-            ⏰ Expires: ${expiry}<br>
-            ${status}<br>
-            ${warning}
-        </div>
-        `;
-    }).join("");
+    return `
+    <div style="margin-top:8px;">
+        📅 Earned: ${earned}<br>
+        ⏰ Expires: ${expiry}<br>
+        🎁 Available
+    </div>
+    `;
+}).join("")
+: "No available rewards";
 
 }else{
     rewardsBox.innerHTML = "No rewards yet";
