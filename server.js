@@ -376,7 +376,7 @@ app.post("/redeem-reward", async (req, res) => {
         }
 
        const result = await Customer.updateOne(
-    { phone, "rewards._id": rewardId },
+    { phone, "rewards._id": new mongoose.Types.ObjectId(rewardId) },
     {
         $set: {
             "rewards.$.used": true,
@@ -557,7 +557,3 @@ setInterval(() => {
         .then(() => console.log("🔁 Self ping success"))
         .catch(() => console.log("❌ Self ping failed"));
 }, 240000); // every 4 minutes
-
-app.get("/check-version", (req, res) => {
-    res.send("NEW VERSION WORKING");
-});
