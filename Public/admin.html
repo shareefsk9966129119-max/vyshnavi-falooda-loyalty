@@ -289,7 +289,7 @@ if(data.rewards && data.rewards.length > 0){
     box.innerHTML = data.rewards.map(r => {
 
         const earned = new Date(r.earnedAt).toLocaleDateString();
-        const expiry = new Date(r.expiryDate).toLocaleDateString();
+const expiryText = new Date(r.expiryDate).toLocaleDateString();
 
         // 🔥 STATUS (USED / AVAILABLE)
 let status = "";
@@ -330,7 +330,7 @@ if(new Date(r.expiryDate) < new Date()){
         return `
 <div style="margin-top:8px; color:${color};">
     📅 Earned: ${earned}<br>
-    ⏰ Expires: ${expiry}<br>
+    ⏰ Expires: ${expiryText}<br>
     ${status}<br>
     ${warning}
 </div>
